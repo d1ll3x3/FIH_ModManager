@@ -1,0 +1,140 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:FIHModManager.Infrastructure"
+             x:Class="FIHModManager.Views.HomeView">
+    <ScrollViewer>
+        <StackPanel Margin="32,4,32,32" Spacing="16">
+
+            <!-- Sin juego -->
+            <Border Classes="card" Padding="32" IsVisible="{Binding !HasGame}">
+                <StackPanel HorizontalAlignment="Center" Spacing="6">
+                    <TextBlock Classes="icon" Text="{x:Static loc:Icons.Game}" FontSize="44" Foreground="{StaticResource MutedBrush}" />
+                    <TextBlock Text="{loc:Tr home.noGame.title}" Classes="h2" HorizontalAlignment="Center" Margin="0,8,0,0" />
+                    <TextBlock Text="{loc:Tr home.noGame.text}" Classes="muted" HorizontalAlignment="Center" />
+                    <Button Classes="primary" Content="{loc:Tr home.addFolder}" Margin="0,12,0,0" HorizontalAlignment="Center"
+                            Command="{Binding AddGameFolderCommand}" />
+                </StackPanel>
+            </Border>
+
+            <StackPanel Spacing="16" IsVisible="{Binding HasGame}">
+                <!-- Hero -->
+                <Border CornerRadius="18" Background="{StaticResource HeroGradient}" ClipToBounds="True">
+                    <Panel>
+                        <Border Width="230" Height="230" HorizontalAlignment="Right" Margin="0,-20,-20,-40" Opacity="0.22" CornerRadius="40" ClipToBounds="True">
+                            <Image Source="/Assets/icon.png" Stretch="UniformToFill" />
+                        </Border>
+                        <StackPanel Margin="30,28">
+                            <TextBlock Text="{loc:Tr home.ready}" FontSize="11" FontWeight="Bold" Foreground="#CCFFFFFF" />
+                            <TextBlock Text="{Binding SelectedGame.Name}" FontSize="28" FontWeight="Bold" Margin="0,6,0,4"
+                                       TextTrimming="CharacterEllipsis" MaxWidth="560" HorizontalAlignment="Left" FlowDirection="LeftToRight" />
+                            <TextBlock Text="{Binding SelectedGame.Path}" FontSize="12" Foreground="#AAFFFFFF"
+                                       TextTrimming="CharacterEllipsis" MaxWidth="560" HorizontalAlignment="Left" FlowDirection="LeftToRight" />
+                            <StackPanel Orientation="Horizontal" Margin="0,22,0,0" Spacing="10">
+                                <Button Classes="primary" Command="{Binding PlayCommand}" Padding="26,12">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Classes="icon" Text="{x:Static loc:Icons.Play}" />
+                                        <TextBlock Text="{loc:Tr home.playMods}" FontSize="14" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Classes="glass" Command="{Binding PlayVanillaCommand}" Padding="18,12"
+                                        Content="{loc:Tr home.playVanilla}" ToolTip.Tip="{loc:Tr home.playVanilla.tip}" />
+                                <Button Classes="glass" Command="{Binding OpenGameFolderCommand}" Padding="14,12" ToolTip.Tip="{loc:Tr home.openFolder.tip}">
+                                    <TextBlock Classes="icon" Text="{x:Static loc:Icons.Folder}" />
+                                </Button>
+                            </StackPanel>
+                            <TextBlock Text="{loc:Tr home.alreadyRunning}" FontSize="12" Foreground="#CCFFFFFF" Margin="0,10,0,0"
+                                       IsVisible="{Binding IsGameRunning}" />
+                        </StackPanel>
+                    </Panel>
+                </Border>
+
+                <Grid ColumnDefinitions="1.6*,16,*">
+                    <!-- BepInEx -->
+                    <Border Classes="card">
+                        <StackPanel>
+                            <DockPanel>
+                                <Panel DockPanel.Dock="Left" Width="44" Height="44">
+                                    <Border CornerRadius="12" Background="{StaticResource WarningSoftBrush}" IsVisible="{Binding BepInExNeedsInstall}">
+                                        <TextBlock Classes="icon" Text="{x:Static loc:Icons.Warning}" FontSize="22" Foreground="{StaticResource WarningBrush}" />
+                                    </Border>
+                                    <Border CornerRadius="12" Background="{StaticResource SuccessSoftBrush}" IsVisible="{Binding !BepInExNeedsInstall}">
+                                        <TextBlock Classes="icon" Text="{x:Static loc:Icons.Ok}" FontSize="22" Foreground="{StaticResource SuccessBrush}" />
+                                    </Border>
+                                </Panel>
+                                <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding BepInExStatusText}" Classes="h2" />
+                                    <TextBlock Text="{Binding BepInExDetailText}" Classes="muted" Margin="0,2,0,0" />
+                                </StackPanel>
+                            </DockPanel>
+
+                            <Border Background="{StaticResource Accent2SoftBrush}" CornerRadius="10" Padding="12,10" Margin="0,16,0,0"
+                                    IsVisible="{Binding FirstLaunchPending}">
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Left" Classes="icon" Text="{x:Static loc:Icons.Info}" Foreground="{StaticResource Accent2Brush}"
+                                               Margin="0,0,10,0" VerticalAlignment="Top" />
+                                    <TextBlock Text="{loc:Tr home.firstLaunch}" TextWrapping="Wrap" FontSize="12" />
+                                </DockPanel>
+                            </Border>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,18,0,0" Spacing="10">
+                                <Button Content="{Binding BepInExActionText}" Command="{Binding InstallBepInExCommand}"
+                                        Classes.primary="{Binding BepInExActionPrimary}" />
+                                <Button Classes="danger" Content="{loc:Tr common.uninstall}" Command="{Binding UninstallBepInExCommand}"
+                                        IsVisible="{Binding BepInExInstalled}" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding BundledText}" Classes="muted" FontSize="11" Margin="0,12,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Resumen de mods -->
+                    <Border Grid.Column="2" Classes="card">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Top" Text="{loc:Tr home.mods}" Classes="h2" />
+                            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,16,0,0" Spacing="10">
+                                <Button Content="{loc:Tr home.manage}" Command="{Binding NavigateCommand}" CommandParameter="Mods" />
+                                <Button Classes="ghost" Content="{loc:Tr nav.explore}" Command="{Binding NavigateCommand}" CommandParameter="Explore" />
+                            </StackPanel>
+                            <StackPanel VerticalAlignment="Center" Margin="0,12,0,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding EnabledModCount}" FontSize="38" FontWeight="Bold" />
+                                    <TextBlock Text="/" FontSize="38" FontWeight="Bold" Foreground="{StaticResource MutedBrush}" />
+                                    <TextBlock Text="{Binding Mods.Count}" FontSize="38" FontWeight="Bold" Foreground="{StaticResource MutedBrush}" />
+                                </StackPanel>
+                                <TextBlock Text="{loc:Tr home.enabled}" Classes="muted" />
+                                <Border Background="{StaticResource AccentSoftBrush}" CornerRadius="8" Padding="10,6" Margin="0,10,0,0" HorizontalAlignment="Left"
+                                        IsVisible="{Binding UpdateCount, Converter={StaticResource HasItems}}">
+                                    <TextBlock Text="{Binding UpdatesText}" FontSize="12" FontWeight="SemiBold" />
+                                </Border>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Proton (solo Linux): opción de lanzamiento de Steam -->
+                <Border Classes="card" Padding="20,16" IsVisible="{Binding ShowProton}">
+                    <DockPanel>
+                        <Panel DockPanel.Dock="Left" Margin="0,0,14,0" VerticalAlignment="Center">
+                            <TextBlock Classes="icon" Text="{x:Static loc:Icons.Ok}" Foreground="{StaticResource SuccessBrush}" IsVisible="{Binding ProtonOk}" />
+                            <TextBlock Classes="icon" Text="{x:Static loc:Icons.Warning}" Foreground="{StaticResource WarningBrush}" IsVisible="{Binding !ProtonOk}" />
+                        </Panel>
+                        <Button DockPanel.Dock="Right" Classes="primary" Content="{loc:Tr proton.apply}" Command="{Binding ApplyProtonCommand}"
+                                IsVisible="{Binding !ProtonOk}" VerticalAlignment="Center" Margin="12,0,0,0" />
+                        <StackPanel>
+                            <TextBlock Text="{loc:Tr proton.title}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding ProtonText}" Classes="muted" FontSize="12" Margin="0,2,0,0" />
+                            <TextBlock Text="WINEDLLOVERRIDES=&quot;winhttp=n,b&quot; %command%" FontFamily="monospace" FontSize="11"
+                                       Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0" FlowDirection="LeftToRight" />
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+
+                <Border Classes="card" Padding="20,16">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Left" Classes="icon" Text="{x:Static loc:Icons.Tip}" Foreground="{StaticResource WarningBrush}" Margin="0,0,14,0" />
+                        <TextBlock Text="{loc:Tr home.tip}" Classes="muted" />
+                    </DockPanel>
+                </Border>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

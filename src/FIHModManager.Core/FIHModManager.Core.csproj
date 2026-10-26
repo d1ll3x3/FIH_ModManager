@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Lógica sin interfaz: servicios, ViewModels, traducciones y el BepInEx embebido. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>FIHModManager.Core</AssemblyName>
+    <RootNamespace>FIHModManager</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- BepInEx 6.0.0-be.755 IL2CPP (el zip del escritorio): bajo Proton se usa el mismo build de Windows -->
+    <EmbeddedResource Include="Resources\BepInEx.zip" LogicalName="BepInEx.zip" />
+    <EmbeddedResource Include="Resources\Lang\*.json" LogicalName="Lang.%(Filename).json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System.IO" />
+    <Using Include="System.Net.Http" />
+  </ItemGroup>
+
+</Project>

@@ -1,7 +1,8 @@
 # FIH Mod Manager
 
 Mod manager for **Flipping is Hard** (BepInEx 6 IL2CPP). Install BepInEx, add, enable,
-update and configure mods without touching the game files by hand.
+update and configure mods without touching the game files by hand. Runs on **Windows** and
+**Linux** (Steam with Proton, including the Steam Deck in desktop mode).
 
 ## Features
 
@@ -28,6 +29,8 @@ update and configure mods without touching the game files by hand.
 
 ## Installation
 
+### Windows
+
 Download `FIHModManager.exe` from the
 [latest release](https://github.com/d1ll3x3/FIH_ModManager/releases/latest) and run it.
 It is a single self-contained file for Windows 10/11 x64: no installer and no .NET runtime
@@ -36,6 +39,26 @@ needed.
 Steam installs are found on any drive. Non-Steam copies are found through a desktop shortcut,
 or can be added from Settings > Add folder.
 
+### Linux
+
+Download `FIHModManager-linux-x64` from the
+[latest release](https://github.com/d1ll3x3/FIH_ModManager/releases/latest), make it
+executable and run it:
+
+```
+chmod +x FIHModManager-linux-x64
+./FIHModManager-linux-x64
+```
+
+It is self-contained (x86-64, no .NET runtime needed). Native Steam, `~/.steam` and Flatpak
+Steam libraries are scanned on every drive.
+
+Under Proton, BepInEx only loads with the Steam launch option
+`WINEDLLOVERRIDES="winhttp=n,b" %command%`. The manager writes it into Steam's
+`localconfig.vdf` when you install BepInEx (a backup is kept as `localconfig.vdf.fihmm-backup`).
+Steam must be fully closed at that moment, because it overwrites that file when it exits; if it
+was open, close it and press **Apply** on the Proton card in Home.
+
 ## How files are organised
 
 | What | Where |
@@ -43,23 +66,34 @@ or can be added from Settings > Add folder.
 | Enabled mods | `BepInEx\plugins` |
 | Disabled mods | `BepInEx\disabled_plugins` (BepInEx does not load them) |
 | Profiles and the source of each mod | `BepInEx\fihmm.json` |
-| App settings and log | `%APPDATA%\FIHModManager` |
+| App settings and log | `%APPDATA%\FIHModManager` (Windows), `~/.config/FIHModManager` (Linux) |
 
 Mods disabled by renaming their DLL (`.dl`, `.dll.disabled`) are recognised as disabled, and
 enabling them restores the `.dll` extension.
 
 ## Building
 
-Requires the .NET 10 SDK.
+Requires the .NET 10 SDK. The solution has three projects:
+
+| Project | What |
+|---|---|
+| `src/FIHModManager.Core` | Shared logic: services, view models, translations, bundled BepInEx |
+| `src/FIHModManager` | Windows interface (WPF) |
+| `src/FIHModManager.Linux` | Linux interface (Avalonia) |
 
 ```
-dotnet publish src/FIHModManager -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish
+dotnet publish src/FIHModManager -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/windows
+dotnet publish src/FIHModManager.Linux -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish/linux
 ```
 
-Translations live in `src/FIHModManager/Resources/Lang/<code>.json`; missing keys fall back to
-English.
+The Linux build is published as `FIHModManager-linux-x64` in the release; self-update looks for
+that asset name.
+
+Translations live in `src/FIHModManager.Core/Resources/Lang/<code>.json`; missing keys fall
+back to English.
 
 ## License
 
-GNU Affero General Public License v3.0, see [LICENSE](LICENSE). BepInEx is bundled under the
-LGPL-2.1, see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+GNU Affero General Public License v3.0, see [LICENSE](LICENSE). Bundled third-party components
+(BepInEx, Avalonia, Inter, Material Icons) are listed in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

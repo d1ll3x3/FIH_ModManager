@@ -1,31 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- Interfaz de Windows (WPF). La lógica vive en FIHModManager.Core. -->
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>FIHModManager</AssemblyName>
     <RootNamespace>FIHModManager</RootNamespace>
     <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
-    <Product>FIH Mod Manager</Product>
-    <Version>1.0.0</Version>
-    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Los proyectos WPF no incluyen estos en ImplicitUsings -->
-    <Using Include="System.IO" />
-    <Using Include="System.Net.Http" />
+    <ProjectReference Include="..\FIHModManager.Core\FIHModManager.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- BepInEx 6.0.0-be.755 IL2CPP (el zip del escritorio), embebido para que el .exe sea autosuficiente -->
-    <EmbeddedResource Include="Resources\BepInEx.zip" LogicalName="BepInEx.zip" />
-    <EmbeddedResource Include="Resources\Lang\*.json" LogicalName="Lang.%(Filename).json" />
     <Resource Include="Resources\icon.png" />
     <Resource Include="Resources\icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System.IO" />
+    <Using Include="System.Net.Http" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,89 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:FIHModManager.Infrastructure"
+             xmlns:vm="using:FIHModManager.ViewModels"
+             x:Class="FIHModManager.Views.ExploreView">
+    <UserControl.Styles>
+        <Style Selector="Border.catalog.update">
+            <Setter Property="BorderBrush" Value="#66E0344B" />
+        </Style>
+    </UserControl.Styles>
+    <ScrollViewer>
+        <StackPanel Margin="32,4,32,32">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Classes="icon" Content="{x:Static loc:Icons.Refresh}" ToolTip.Tip="{loc:Tr explore.refresh.tip}"
+                        Command="{Binding RefreshCatalogCommand}" VerticalAlignment="Center" />
+                <StackPanel>
+                    <TextBlock Text="{loc:Tr nav.explore}" Classes="h1" />
+                    <TextBlock Text="{loc:Tr explore.subtitle}" Classes="muted" Margin="0,2,0,0" />
+                </StackPanel>
+            </DockPanel>
+
+            <Border Classes="card" Margin="0,20,0,0" Padding="16">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Classes="primary" Content="{loc:Tr common.install}" Margin="10,0,0,0"
+                            Command="{Binding InstallRepoInputCommand}" />
+                    <TextBox Text="{Binding RepoInput}" Watermark="{loc:Tr explore.repoPlaceholder}">
+                        <TextBox.InnerLeftContent>
+                            <TextBlock Classes="icon" Text="{x:Static loc:Icons.Link}" FontSize="16" Foreground="{StaticResource MutedBrush}" Margin="10,0,0,0" />
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+                </DockPanel>
+            </Border>
+
+            <Border Background="{StaticResource WarningSoftBrush}" CornerRadius="10" Padding="14,10" Margin="0,14,0,0"
+                    IsVisible="{Binding CatalogError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Classes="icon" Text="{x:Static loc:Icons.Warning}" Foreground="{StaticResource WarningBrush}"
+                               Margin="0,0,10,0" VerticalAlignment="Top" />
+                    <TextBlock Text="{Binding CatalogError}" TextWrapping="Wrap" FontSize="12" />
+                </DockPanel>
+            </Border>
+
+            <TextBlock Text="{loc:Tr explore.section}" Classes="h2" Margin="2,26,0,12" />
+
+            <ItemsControl ItemsSource="{Binding Catalog}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="2" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vm:CatalogItemViewModel">
+                        <Border Classes="card catalog" Margin="0,0,12,12" Padding="18" Classes.update="{Binding CanUpdate}">
+                            <DockPanel>
+                                <DockPanel DockPanel.Dock="Bottom" Margin="0,16,0,0">
+                                    <Button DockPanel.Dock="Right" Content="{Binding ActionText}" Classes.primary="{Binding IsPrimaryAction}"
+                                            Command="{Binding $parent[UserControl].DataContext.InstallCatalogCommand}" CommandParameter="{Binding}" />
+                                    <Button Classes="ghost" Padding="8,6" ToolTip.Tip="{loc:Tr explore.viewOnGitHub}"
+                                            Command="{Binding $parent[UserControl].DataContext.OpenRepoCommand}" CommandParameter="{Binding Repo}">
+                                        <!-- -calt: Inter convierte la x entre cifras en un signo de multiplicar ("d1ll3×3") -->
+                                        <TextBlock Text="{Binding Repo}" FontWeight="Normal" FontSize="12" Foreground="{StaticResource MutedBrush}"
+                                                   TextTrimming="CharacterEllipsis" FontFeatures="-calt" />
+                                    </Button>
+                                </DockPanel>
+
+                                <Border DockPanel.Dock="Left" Width="46" Height="46" CornerRadius="12" Background="{StaticResource AccentGradient}" VerticalAlignment="Top">
+                                    <TextBlock Classes="icon" Text="{Binding Icon, Converter={StaticResource IconGlyph}}" FontSize="22" Foreground="White" />
+                                </Border>
+
+                                <StackPanel Margin="14,0,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Title}" Classes="h2" Margin="0,0,10,0" />
+                                        <Border Classes="badge">
+                                            <TextBlock Text="{Binding LatestText}" />
+                                        </Border>
+                                        <Border Classes="badge" Background="{StaticResource SuccessSoftBrush}" IsVisible="{Binding IsInstalled}">
+                                            <TextBlock Text="{loc:Tr explore.installed}" Foreground="{StaticResource SuccessBrush}" />
+                                        </Border>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding Description}" Classes="muted" Margin="0,6,0,0" />
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

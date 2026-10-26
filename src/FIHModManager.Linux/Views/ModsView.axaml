@@ -1,0 +1,107 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:FIHModManager.Infrastructure"
+             xmlns:vm="using:FIHModManager.ViewModels"
+             x:Class="FIHModManager.Views.ModsView">
+    <UserControl.Styles>
+        <Style Selector="Border.mod.off">
+            <Setter Property="Background" Value="#14141C" />
+        </Style>
+        <Style Selector="Border.mod.off TextBlock.modTitle">
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+        </Style>
+        <Style Selector="Border.mod.update">
+            <Setter Property="BorderBrush" Value="#66E0344B" />
+        </Style>
+    </UserControl.Styles>
+
+    <DockPanel Margin="32,4,32,0">
+        <DockPanel DockPanel.Dock="Top">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
+                <Button Classes="icon" Content="{x:Static loc:Icons.Folder}" ToolTip.Tip="{loc:Tr mods.openPlugins.tip}" Command="{Binding OpenPluginsFolderCommand}" />
+                <Button Content="{loc:Tr mods.checkUpdates}" Command="{Binding CheckUpdatesCommand}" />
+                <Button Content="{loc:Tr mods.fromGitHub}" Command="{Binding NavigateCommand}" CommandParameter="Explore" />
+                <Button Classes="primary" Command="{Binding AddModFileCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Classes="icon" Text="{x:Static loc:Icons.Add}" FontSize="16" />
+                        <TextBlock Text="{loc:Tr mods.add}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            <StackPanel>
+                <TextBlock Text="{loc:Tr nav.mods}" Classes="h1" />
+                <TextBlock Text="{Binding ModsInstalledText}" Classes="muted" Margin="0,2,0,0" />
+            </StackPanel>
+        </DockPanel>
+
+        <TextBox DockPanel.Dock="Top" Margin="0,20,0,14" Text="{Binding ModFilter}" Watermark="{loc:Tr mods.search}">
+            <TextBox.InnerLeftContent>
+                <TextBlock Classes="icon" Text="{x:Static loc:Icons.Search}" FontSize="16" Foreground="{StaticResource MutedBrush}" Margin="10,0,0,0" />
+            </TextBox.InnerLeftContent>
+        </TextBox>
+
+        <Panel>
+            <Border Classes="card" VerticalAlignment="Top" Padding="36" IsVisible="{Binding Mods.Count, Converter={StaticResource NoItems}}">
+                <StackPanel HorizontalAlignment="Center" Spacing="6">
+                    <TextBlock Classes="icon" Text="{x:Static loc:Icons.Download}" FontSize="44" Foreground="{StaticResource MutedBrush}" />
+                    <TextBlock Text="{loc:Tr mods.empty.title}" Classes="h2" HorizontalAlignment="Center" Margin="0,8,0,0" />
+                    <TextBlock Text="{loc:Tr mods.empty.text}" Classes="muted" HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <ScrollViewer>
+                <ItemsControl ItemsSource="{Binding FilteredMods}" Margin="0,0,0,24">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="vm:ModItemViewModel">
+                            <Border Classes="card mod" Padding="18,14" Margin="0,0,0,10"
+                                    Classes.off="{Binding !IsEnabled}" Classes.update="{Binding UpdateAvailable}">
+                                <DockPanel>
+                                    <ToggleSwitch DockPanel.Dock="Left" Classes="switch" IsChecked="{Binding IsEnabled}" VerticalAlignment="Center"
+                                                  ToolTip.Tip="{loc:Tr mods.toggle.tip}" />
+
+                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Spacing="2">
+                                        <Button Classes="primary" Padding="12,6" Margin="0,0,6,0" Content="{Binding UpdateText}"
+                                                Command="{Binding $parent[UserControl].DataContext.UpdateModCommand}" CommandParameter="{Binding}"
+                                                IsVisible="{Binding UpdateAvailable}" />
+                                        <Button Classes="icon" Content="{x:Static loc:Icons.Config}" ToolTip.Tip="{loc:Tr mods.config.tip}"
+                                                Command="{Binding $parent[UserControl].DataContext.OpenModConfigCommand}" CommandParameter="{Binding}"
+                                                IsVisible="{Binding HasConfig}" />
+                                        <Button Classes="icon" Content="{x:Static loc:Icons.Folder}" ToolTip.Tip="{loc:Tr mods.folder.tip}"
+                                                Command="{Binding $parent[UserControl].DataContext.OpenModFolderCommand}" CommandParameter="{Binding}" />
+                                        <Button Classes="icon" Content="{x:Static loc:Icons.Delete}" ToolTip.Tip="{loc:Tr mods.delete.tip}"
+                                                Command="{Binding $parent[UserControl].DataContext.DeleteModCommand}" CommandParameter="{Binding}" />
+                                    </StackPanel>
+
+                                    <StackPanel Margin="10,0,12,0" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Classes="modTitle" Text="{Binding Title}" FontSize="15" FontWeight="SemiBold" Margin="0,0,10,0" />
+                                            <Border Classes="badge" IsVisible="{Binding Version, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                                <TextBlock Text="{Binding Version}" />
+                                            </Border>
+                                            <Border Classes="badge" Background="{StaticResource Accent2SoftBrush}" IsVisible="{Binding IsGitHub}">
+                                                <TextBlock Text="GitHub" Foreground="{StaticResource Accent2Brush}" />
+                                            </Border>
+                                            <Border Classes="badge" IsVisible="{Binding ExtraPlugins, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                                <TextBlock Text="{Binding ExtraPlugins}" />
+                                            </Border>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0" Spacing="10">
+                                            <TextBlock Text="{Binding Guid}" Classes="muted" FontSize="12" TextWrapping="NoWrap" />
+                                            <TextBlock Text="{Binding Entry.SizeBytes, Converter={StaticResource Bytes}}" Classes="muted" FontSize="12" TextWrapping="NoWrap" />
+                                            <TextBlock Text="{Binding Entry.Key}" Classes="muted" FontSize="12" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0" Spacing="6"
+                                                    IsVisible="{Binding Warning, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                            <TextBlock Classes="icon" Text="{x:Static loc:Icons.Warning}" FontSize="14" Foreground="{StaticResource WarningBrush}" />
+                                            <TextBlock Text="{Binding Warning}" FontSize="12" Foreground="{StaticResource WarningBrush}" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </DockPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Panel>
+    </DockPanel>
+</UserControl>

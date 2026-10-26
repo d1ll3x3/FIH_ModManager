@@ -1,0 +1,177 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:FIHModManager.Infrastructure"
+        xmlns:vm="using:FIHModManager.ViewModels"
+        xmlns:models="using:FIHModManager.Models"
+        x:Class="FIHModManager.MainWindow"
+        Title="FIH Mod Manager" Width="1220" Height="780" MinWidth="980" MinHeight="640"
+        WindowStartupLocation="CenterScreen" Icon="/Assets/icon.ico"
+        Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}"
+        DragDrop.AllowDrop="True">
+
+    <Panel>
+        <Grid ColumnDefinitions="260,*">
+            <!-- ================= Barra lateral ================= -->
+            <Border Grid.Column="0" Background="{StaticResource SidebarBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
+                <DockPanel Margin="16,18,16,16">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4,0,0,22" Spacing="12">
+                        <Border Width="42" Height="42" CornerRadius="11" ClipToBounds="True">
+                            <Image Source="/Assets/icon.png" Stretch="UniformToFill" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="FIH Mod Manager" FontSize="16" FontWeight="Bold" />
+                            <TextBlock Text="Flipping is Hard" FontSize="12" Foreground="{StaticResource MutedBrush}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,18">
+                        <TextBlock Text="{loc:Tr side.installation}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource MutedBrush}" Margin="4,0,0,6" />
+                        <ComboBox ItemsSource="{Binding Games}" SelectedItem="{Binding SelectedGame}" HorizontalAlignment="Stretch" MinHeight="54">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="models:GameInstall">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="180" FlowDirection="LeftToRight" />
+                                        <TextBlock FontSize="11" Foreground="{StaticResource MutedBrush}">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource TrKey}" ConverterParameter="origin.">
+                                                    <Binding Path="Origin" />
+                                                    <Binding Source="{x:Static loc:Loc.Instance}" Path="Language" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <Border DockPanel.Dock="Bottom" Background="{StaticResource SurfaceBrush}" CornerRadius="12" Padding="14,12">
+                        <StackPanel Spacing="4">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Ellipse Width="8" Height="8" Fill="{StaticResource WarningBrush}" IsVisible="{Binding BepInExNeedsInstall}" />
+                                <Ellipse Width="8" Height="8" Fill="{StaticResource SuccessBrush}" IsVisible="{Binding !BepInExNeedsInstall}" />
+                                <TextBlock Text="{Binding BepInExStatusText}" FontSize="12" FontWeight="SemiBold" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding ModsActiveText}" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="16,0,0,0" />
+                            <StackPanel Orientation="Horizontal" Spacing="6" Margin="16,0,0,0" IsVisible="{Binding IsGameRunning}">
+                                <TextBlock Classes="icon" Text="{x:Static loc:Icons.Game}" FontSize="14" Foreground="{StaticResource SuccessBrush}" />
+                                <TextBlock Text="{loc:Tr side.gameRunning}" FontSize="12" Foreground="{StaticResource SuccessBrush}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel>
+                        <RadioButton Classes="nav" GroupName="nav" Content="{loc:Tr nav.home}" Tag="{x:Static loc:Icons.Home}"
+                                     IsChecked="{Binding CurrentPage, Converter={StaticResource Equals}, ConverterParameter=Home}" />
+                        <RadioButton Classes="nav" GroupName="nav" Tag="{x:Static loc:Icons.Mods}"
+                                     IsChecked="{Binding CurrentPage, Converter={StaticResource Equals}, ConverterParameter=Mods}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="{loc:Tr nav.mods}" />
+                                <Border Background="{StaticResource AccentBrush}" CornerRadius="8" Padding="6,0" VerticalAlignment="Center"
+                                        IsVisible="{Binding UpdateCount, Converter={StaticResource HasItems}}">
+                                    <TextBlock Text="{Binding UpdateCount}" FontSize="11" FontWeight="Bold" Foreground="White" />
+                                </Border>
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton Classes="nav" GroupName="nav" Content="{loc:Tr nav.explore}" Tag="{x:Static loc:Icons.Explore}"
+                                     IsChecked="{Binding CurrentPage, Converter={StaticResource Equals}, ConverterParameter=Explore}" />
+                        <RadioButton Classes="nav" GroupName="nav" Content="{loc:Tr nav.config}" Tag="{x:Static loc:Icons.Config}"
+                                     IsChecked="{Binding CurrentPage, Converter={StaticResource Equals}, ConverterParameter=Config}" />
+                        <RadioButton Classes="nav" GroupName="nav" Content="{loc:Tr nav.profiles}" Tag="{x:Static loc:Icons.Profiles}"
+                                     IsChecked="{Binding CurrentPage, Converter={StaticResource Equals}, ConverterParameter=Profiles}" />
+                        <RadioButton Classes="nav" GroupName="nav" Content="{loc:Tr nav.settings}" Tag="{x:Static loc:Icons.Settings}"
+                                     IsChecked="{Binding CurrentPage, Converter={StaticResource Equals}, ConverterParameter=Settings}" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <!-- ================= Contenido ================= -->
+            <Panel Grid.Column="1">
+                <TransitioningContentControl Name="PageHost" Margin="0,24,0,0">
+                    <TransitioningContentControl.PageTransition>
+                        <CrossFade Duration="0:0:0.18" />
+                    </TransitioningContentControl.PageTransition>
+                </TransitioningContentControl>
+
+                <Border VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="32,0,0,24" Padding="16,12" Width="360"
+                        Background="{StaticResource Surface2Brush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="12"
+                        IsVisible="{Binding IsBusy}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="{Binding BusyText}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                        <ProgressBar Value="{Binding Progress}" Maximum="1" IsIndeterminate="{Binding IsIndeterminate}" />
+                    </StackPanel>
+                </Border>
+            </Panel>
+        </Grid>
+
+        <!-- ================= Avisos ================= -->
+        <ItemsControl ItemsSource="{Binding Toasts}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,24" Width="380">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="vm:ToastViewModel">
+                    <Border Margin="0,8,0,0" Padding="14,12" CornerRadius="12" BorderThickness="1"
+                            Background="{StaticResource Surface2Brush}" BorderBrush="{StaticResource LineBrush}"
+                            BoxShadow="0 6 24 0 #73000000">
+                        <DockPanel>
+                            <Panel DockPanel.Dock="Left" Margin="0,0,12,0" VerticalAlignment="Top">
+                                <TextBlock Classes="icon" Text="{x:Static loc:Icons.Info}" Foreground="{StaticResource Accent2Brush}"
+                                           IsVisible="{Binding Kind, Converter={StaticResource Equals}, ConverterParameter=Info}" />
+                                <TextBlock Classes="icon" Text="{x:Static loc:Icons.Ok}" Foreground="{StaticResource SuccessBrush}"
+                                           IsVisible="{Binding Kind, Converter={StaticResource Equals}, ConverterParameter=Success}" />
+                                <TextBlock Classes="icon" Text="{x:Static loc:Icons.Error}" Foreground="{StaticResource DangerBrush}"
+                                           IsVisible="{Binding Kind, Converter={StaticResource Equals}, ConverterParameter=Error}" />
+                            </Panel>
+                            <Button DockPanel.Dock="Right" Classes="icon" Width="22" Height="22" FontSize="14" Content="{x:Static loc:Icons.Close}"
+                                    VerticalAlignment="Top" Margin="8,0,0,0"
+                                    Command="{Binding $parent[Window].DataContext.DismissToastCommand}" CommandParameter="{Binding}" />
+                            <TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontSize="13" />
+                        </DockPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- ================= Arrastrar y soltar ================= -->
+        <Border Name="DropOverlay" Background="#D90E0E14" IsVisible="False" IsHitTestVisible="False">
+            <Border Margin="40" CornerRadius="24" BorderThickness="2" BorderBrush="{StaticResource AccentBrush}" Background="#14E0344B">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="6">
+                    <TextBlock Classes="icon" Text="{x:Static loc:Icons.Download}" FontSize="56" Foreground="{StaticResource AccentBrush}" />
+                    <TextBlock Text="{loc:Tr drop.title}" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,0" />
+                    <TextBlock Text="{loc:Tr drop.subtitle}" Classes="muted" HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- ================= Diálogo modal ================= -->
+        <Panel Background="#B3000000" IsVisible="{Binding Dialog, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <Border Classes="card" Width="460" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="26"
+                    DataContext="{Binding Dialog}" BoxShadow="0 8 40 0 #80000000">
+                <StackPanel>
+                    <TextBlock Text="{Binding Title}" Classes="h2" FontSize="18" TextWrapping="Wrap" />
+                    <ScrollViewer MaxHeight="320" Margin="0,10,0,0"
+                                  IsVisible="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                        <TextBlock Text="{Binding Message}" Classes="muted" />
+                    </ScrollViewer>
+                    <TextBox Name="DialogInput" Text="{Binding Input}" Watermark="{Binding InputPlaceholder}" Margin="0,16,0,0"
+                             IsVisible="{Binding ShowInput}" />
+                    <ListBox Classes="select" ItemsSource="{Binding Choices}" SelectedItem="{Binding SelectedChoice}" Margin="0,14,0,0" MaxHeight="240"
+                             IsVisible="{Binding Choices, Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="models:GitHubAsset">
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Right" Text="{Binding Size, Converter={StaticResource Bytes}}" Foreground="{StaticResource MutedBrush}" />
+                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0" Spacing="10">
+                        <Button Content="{Binding SecondaryText}" Command="{Binding SecondaryCommand}" IsCancel="True"
+                                IsVisible="{Binding SecondaryText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                        <Button Content="{Binding PrimaryText}" Command="{Binding PrimaryCommand}" IsDefault="True"
+                                Classes.primary="{Binding !IsDanger}" Classes.dangerSolid="{Binding IsDanger}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Panel>
+    </Panel>
+</Window>

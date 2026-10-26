@@ -1,0 +1,65 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:FIHModManager.Infrastructure"
+             xmlns:vm="using:FIHModManager.ViewModels"
+             x:Class="FIHModManager.Views.ProfilesView">
+    <ScrollViewer>
+        <StackPanel Margin="32,4,32,32">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Classes="primary" Command="{Binding SaveProfileCommand}" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Classes="icon" Text="{x:Static loc:Icons.Save}" FontSize="16" />
+                        <TextBlock Text="{loc:Tr profiles.saveCurrent}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <StackPanel>
+                    <TextBlock Text="{loc:Tr nav.profiles}" Classes="h1" />
+                    <TextBlock Text="{loc:Tr profiles.subtitle}" Classes="muted" Margin="0,2,0,0" />
+                </StackPanel>
+            </DockPanel>
+
+            <Border Classes="card" Margin="0,20,0,0" Padding="32" IsVisible="{Binding Profiles.Count, Converter={StaticResource NoItems}}">
+                <StackPanel HorizontalAlignment="Center" Spacing="6">
+                    <TextBlock Classes="icon" Text="{x:Static loc:Icons.Profiles}" FontSize="44" Foreground="{StaticResource MutedBrush}" />
+                    <TextBlock Text="{loc:Tr profiles.empty.title}" Classes="h2" HorizontalAlignment="Center" Margin="0,8,0,0" />
+                    <TextBlock Text="{loc:Tr profiles.empty.text}" Classes="muted" HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <ItemsControl ItemsSource="{Binding Profiles}" Margin="0,20,0,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vm:ProfileItemViewModel">
+                        <Border Classes="card" Margin="0,0,0,10" Padding="18,16">
+                            <DockPanel>
+                                <Border DockPanel.Dock="Left" Width="44" Height="44" CornerRadius="12" Background="{StaticResource Accent2SoftBrush}" VerticalAlignment="Top">
+                                    <TextBlock Classes="icon" Text="{x:Static loc:Icons.Profiles}" FontSize="20" Foreground="{StaticResource Accent2Brush}" />
+                                </Border>
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Spacing="4">
+                                    <Button Classes="primary" Content="{loc:Tr profiles.apply}" Margin="0,0,4,0"
+                                            Command="{Binding $parent[UserControl].DataContext.ApplyProfileCommand}" CommandParameter="{Binding}" />
+                                    <Button Classes="icon" Content="{x:Static loc:Icons.Sync}" ToolTip.Tip="{loc:Tr profiles.overwrite.tip}"
+                                            Command="{Binding $parent[UserControl].DataContext.OverwriteProfileCommand}" CommandParameter="{Binding}" />
+                                    <Button Classes="icon" Content="{x:Static loc:Icons.Delete}" ToolTip.Tip="{loc:Tr profiles.delete.tip}"
+                                            Command="{Binding $parent[UserControl].DataContext.DeleteProfileCommand}" CommandParameter="{Binding}" />
+                                </StackPanel>
+                                <StackPanel Margin="14,0,14,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Name}" Classes="h2" Margin="0,0,10,0" />
+                                        <Border Classes="badge">
+                                            <TextBlock Text="{Binding Summary}" />
+                                        </Border>
+                                        <Border Classes="badge" Background="{StaticResource WarningSoftBrush}" IsVisible="{Binding MissingCount, Converter={StaticResource HasItems}}">
+                                            <TextBlock Text="{Binding MissingText}" Foreground="{StaticResource WarningBrush}" />
+                                        </Border>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding ModsText}" Classes="muted" FontSize="12" Margin="0,6,0,0" />
+                                    <TextBlock Text="{Binding SavedText}" FontSize="11" Foreground="#6E6E88" Margin="0,4,0,0" />
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -41,6 +41,28 @@ public sealed class EqualsConverter : IValueConverter
         value is true ? parameter : Binding.DoNothing;
 }
 
+/// <summary>Nombre neutro de icono del catálogo ("edit", "timer"…) a glifo de Segoe Fluent Icons.</summary>
+public sealed class IconGlyphConverter : IValueConverter
+{
+    private static readonly Dictionary<string, string> Glyphs = new()
+    {
+        ["edit"] = "\uE70F",
+        ["timer"] = "\uE916",
+        ["palette"] = "\uE790",
+        ["flight"] = "\uE709",
+        ["person"] = "\uE77B",
+        ["bolt"] = "\uE945",
+        ["link"] = "\uE71B",
+        ["visibility"] = "\uE7B3",
+    };
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
+        value is string key && Glyphs.TryGetValue(key, out var glyph) ? glyph : "\uE74C";
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+}
+
 public sealed class BytesConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

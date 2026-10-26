@@ -1,0 +1,91 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:FIHModManager.Infrastructure"
+             xmlns:models="using:FIHModManager.Models"
+             x:Class="FIHModManager.Views.SettingsView">
+    <ScrollViewer>
+        <StackPanel Margin="32,4,32,32" Spacing="16">
+            <StackPanel>
+                <TextBlock Text="{loc:Tr nav.settings}" Classes="h1" />
+                <TextBlock Text="{loc:Tr settings.subtitle}" Classes="muted" Margin="0,2,0,0" />
+            </StackPanel>
+
+            <Border Classes="card" Margin="0,4,0,0">
+                <DockPanel>
+                    <ComboBox DockPanel.Dock="Right" Width="220" VerticalAlignment="Center"
+                              ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}" />
+                    <StackPanel>
+                        <TextBlock Text="{loc:Tr settings.language}" Classes="h2" />
+                        <TextBlock Text="{loc:Tr settings.language.text}" Classes="muted" FontSize="12" Margin="0,2,0,0" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <Border Classes="card">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,14">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8">
+                            <Button Classes="icon" Content="{x:Static loc:Icons.Refresh}" ToolTip.Tip="{loc:Tr settings.rescan.tip}" Command="{Binding RefreshCommand}" />
+                            <Button Content="{loc:Tr settings.addFolder}" Command="{Binding AddGameFolderCommand}" />
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock Text="{loc:Tr settings.installs.title}" Classes="h2" />
+                            <TextBlock Text="{loc:Tr settings.installs.text}" Classes="muted" FontSize="12" Margin="0,2,0,0" />
+                        </StackPanel>
+                    </DockPanel>
+
+                    <ItemsControl ItemsSource="{Binding Games}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="models:GameInstall">
+                                <Border Background="{StaticResource Surface2Brush}" CornerRadius="10" Padding="14,10" Margin="0,0,0,6">
+                                    <DockPanel>
+                                        <Button DockPanel.Dock="Right" Classes="icon" Content="{x:Static loc:Icons.Delete}" ToolTip.Tip="{loc:Tr settings.remove.tip}"
+                                                Command="{Binding $parent[UserControl].DataContext.RemoveGameCommand}" CommandParameter="{Binding}" />
+                                        <Border DockPanel.Dock="Right" Classes="badge" Margin="0,0,10,0">
+                                            <TextBlock>
+                                                <TextBlock.Text>
+                                                    <MultiBinding Converter="{StaticResource TrKey}" ConverterParameter="origin.">
+                                                        <Binding Path="Origin" />
+                                                        <Binding Source="{x:Static loc:Loc.Instance}" Path="Language" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </Border>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FlowDirection="LeftToRight" />
+                                            <TextBlock Text="{Binding Path}" FontSize="12" Foreground="{StaticResource MutedBrush}" TextTrimming="CharacterEllipsis" FlowDirection="LeftToRight" />
+                                        </StackPanel>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="{loc:Tr settings.files.title}" Classes="h2" Margin="0,0,0,6" />
+                    <TextBlock Text="{loc:Tr settings.files.1}" Classes="muted" FontSize="12" />
+                    <TextBlock Text="{loc:Tr settings.files.2}" Classes="muted" FontSize="12" />
+                    <TextBlock Text="{loc:Tr settings.files.3}" Classes="muted" FontSize="12" />
+                    <TextBlock Text="{loc:Tr settings.files.4}" Classes="muted" FontSize="12" />
+                    <TextBlock Text="{loc:Tr settings.files.5}" Classes="muted" FontSize="12" />
+                </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="{loc:Tr upd.check}" Command="{Binding CheckAppUpdateCommand}" VerticalAlignment="Center" />
+                    <Border Width="44" Height="44" CornerRadius="11" ClipToBounds="True">
+                        <Image Source="/Assets/icon.png" Stretch="UniformToFill" />
+                    </Border>
+                    <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding AppVersionText}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding BundledText}" Classes="muted" FontSize="12" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

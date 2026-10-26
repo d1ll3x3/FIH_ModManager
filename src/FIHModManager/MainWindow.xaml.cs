@@ -11,11 +11,12 @@ namespace FIHModManager;
 
 public partial class MainWindow : Window
 {
-    private readonly MainViewModel _vm = new();
+    private readonly MainViewModel _vm;
 
     public MainWindow()
     {
         InitializeComponent();
+        _vm = new MainViewModel(new WpfPlatform(this));
         DataContext = _vm;
         ApplyLanguage();
         Loc.Instance.LanguageChanged += ApplyLanguage;
