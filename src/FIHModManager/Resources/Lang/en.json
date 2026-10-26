@@ -193,7 +193,7 @@
   "err.empty": "The archive is empty.",
   "err.zipSlip": "Suspicious entry in the zip: {0}",
   "err.recycle": "Could not move to the Recycle Bin ({0}). Is the game open?",
-  "err.rateLimit": "GitHub has rate-limited the requests (60/hour without an account). Try again in a while.",
+  "err.rateLimit": "GitHub allows 60 checks per hour from your connection and that limit has been reached. It will work again at {0}.",
   "err.noBundle": "The embedded BepInEx was not found in the executable.",
   "err.unexpected": "An unexpected error occurred:\n\n{0}\n\nDetails in {1}"
 }

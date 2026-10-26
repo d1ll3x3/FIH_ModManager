@@ -193,7 +193,7 @@
   "err.empty": "压缩包为空。",
   "err.zipSlip": "zip 中有可疑条目：{0}",
   "err.recycle": "无法移到回收站（{0}）。游戏是否已打开？",
-  "err.rateLimit": "GitHub 已限制请求（未登录每小时 60 次）。请稍后再试。",
+  "err.rateLimit": "GitHub 每小时只允许你的网络发出 60 次请求，现已达到上限。将于 {0} 恢复。",
   "err.noBundle": "可执行文件中未找到内置的 BepInEx。",
   "err.unexpected": "发生意外错误：\n\n{0}\n\n详情见 {1}"
 }

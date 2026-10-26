@@ -193,7 +193,7 @@
   "err.empty": "L'archive est vide.",
   "err.zipSlip": "Entrée suspecte dans le zip : {0}",
   "err.recycle": "Impossible de déplacer vers la Corbeille ({0}). Le jeu est-il ouvert ?",
-  "err.rateLimit": "GitHub a limité les requêtes (60/heure sans compte). Réessayez plus tard.",
+  "err.rateLimit": "GitHub autorise 60 requêtes par heure depuis votre connexion et cette limite est atteinte. Cela fonctionnera de nouveau à {0}.",
   "err.noBundle": "Le BepInEx intégré est introuvable dans l'exécutable.",
   "err.unexpected": "Une erreur inattendue s'est produite :\n\n{0}\n\nDétails dans {1}"
 }

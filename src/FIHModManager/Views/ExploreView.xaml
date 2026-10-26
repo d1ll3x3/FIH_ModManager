@@ -28,6 +28,14 @@
                 </DockPanel>
             </Border>
 
+            <Border Background="{StaticResource WarningSoftBrush}" CornerRadius="10" Padding="14,10" Margin="0,14,0,0"
+                    Visibility="{Binding CatalogError, Converter={StaticResource BoolToVis}}">
+                <DockPanel>
+                    <TextBlock Style="{StaticResource Icon}" Text="&#xE7BA;" Foreground="{StaticResource WarningBrush}" Margin="0,0,10,0" VerticalAlignment="Top" />
+                    <TextBlock Text="{Binding CatalogError}" TextWrapping="Wrap" FontSize="12" />
+                </DockPanel>
+            </Border>
+
             <TextBlock Text="{loc:Tr explore.section}" Style="{StaticResource H2}" Margin="2,26,0,12" />
 
             <ItemsControl ItemsSource="{Binding Catalog}">
@@ -83,8 +91,6 @@
                                         </Border>
                                     </StackPanel>
                                     <TextBlock Text="{Binding Description}" Style="{StaticResource Muted}" Margin="0,6,0,0" />
-                                    <TextBlock Text="{Binding Error}" FontSize="12" Foreground="{StaticResource DangerBrush}" TextWrapping="Wrap" Margin="0,6,0,0"
-                                               Visibility="{Binding Error, Converter={StaticResource BoolToVis}}" />
                                 </StackPanel>
                             </DockPanel>
                         </Border>

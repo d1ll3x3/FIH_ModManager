@@ -8,11 +8,14 @@ namespace FIHModManager.ViewModels;
 public sealed partial class MainViewModel
 {
     private string _repoInput = "";
+    private string? _catalogError;
     private bool _catalogLoaded;
 
     public ObservableCollection<CatalogItemViewModel> Catalog { get; } = [];
 
     public string RepoInput { get => _repoInput; set => Set(ref _repoInput, value); }
+
+    public string? CatalogError { get => _catalogError; private set => Set(ref _catalogError, value); }
 
     public AsyncCommand InstallCatalogCommand { get; private set; } = null!;
     public AsyncCommand InstallRepoInputCommand { get; private set; } = null!;
@@ -33,11 +36,12 @@ public sealed partial class MainViewModel
     {
         if (_catalogLoaded && !force) return;
         _catalogLoaded = true;
+        CatalogError = null;
 
         var tasks = Catalog.Select(async item =>
         {
             item.Loading = true;
-            item.Error = null;
+            item.Failed = false;
             try
             {
                 item.Release = await GitHubService.GetLatestReleaseAsync(item.Repo, force);
@@ -45,7 +49,8 @@ public sealed partial class MainViewModel
             catch (HttpRequestException ex)
             {
                 Log.Error($"Consultar {item.Repo}", ex);
-                item.Error = FriendlyError(ex);
+                item.Failed = true;
+                CatalogError ??= FriendlyError(ex);
             }
             finally
             {

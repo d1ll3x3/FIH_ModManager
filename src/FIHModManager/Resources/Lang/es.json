@@ -193,7 +193,7 @@
   "err.empty": "El archivo está vacío.",
   "err.zipSlip": "Entrada sospechosa en el zip: {0}",
   "err.recycle": "No se pudo mover a la papelera ({0}). ¿Está el juego abierto?",
-  "err.rateLimit": "GitHub ha limitado las peticiones (60/hora sin cuenta). Prueba de nuevo en un rato.",
+  "err.rateLimit": "GitHub permite 60 consultas por hora desde tu conexión y se ha alcanzado el límite. Volverá a funcionar a las {0}.",
   "err.noBundle": "No se encontró el BepInEx embebido en el ejecutable.",
   "err.unexpected": "Ha ocurrido un error inesperado:\n\n{0}\n\nDetalles en {1}"
 }

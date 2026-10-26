@@ -11,8 +11,12 @@ namespace FIHModManager.Services;
 public static partial class GitHubService
 {
     private static readonly HttpClient Http = CreateClient();
-    private static readonly Dictionary<string, (DateTime At, GitHubRelease? Release)> Cache = new(StringComparer.OrdinalIgnoreCase);
-    private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(10);
+    private static readonly string CachePath = Path.Combine(Log.DataDir, "github-cache.json");
+    // En disco: abrir y cerrar el programa no debe volver a gastar cupo de la API.
+    private static readonly Dictionary<string, CachedRelease> Cache = LoadCache();
+    private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(30);
+
+    public sealed record CachedRelease(DateTime FetchedAt, GitHubRelease? Release);
 
     /// <summary>Mods de Flipping is Hard que aparecen en "Explorar".</summary>
     public static readonly IReadOnlyList<CatalogEntry> Catalog =
@@ -44,20 +48,49 @@ public static partial class GitHubService
 
     public static async Task<GitHubRelease?> GetLatestReleaseAsync(string repo, bool force = false)
     {
-        lock (Cache)
+        CachedRelease? cached;
+        lock (Cache) Cache.TryGetValue(repo, out cached);
+        if (!force && cached is not null && DateTime.UtcNow - cached.FetchedAt < CacheTtl) return cached.Release;
+
+        GitHubRelease? release;
+        try
         {
-            if (!force && Cache.TryGetValue(repo, out var c) && DateTime.UtcNow - c.At < CacheTtl) return c.Release;
+            // /releases/latest ignora prereleases; si solo hay prereleases se usa la más reciente.
+            release = await GetJsonAsync($"https://api.github.com/repos/{repo}/releases/latest") is { } latest
+                ? ParseRelease(repo, latest)
+                : await GetJsonAsync($"https://api.github.com/repos/{repo}/releases?per_page=1") is { ValueKind: JsonValueKind.Array } list && list.GetArrayLength() > 0
+                    ? ParseRelease(repo, list[0])
+                    : null;
+        }
+        catch (GitHubRateLimitException ex) when (cached is not null)
+        {
+            // Sin cupo: mejor los últimos datos guardados, aunque estén caducados, que un error.
+            Log.Error($"Límite de GitHub alcanzado; se usa la caché de {repo}", ex);
+            return cached.Release;
         }
 
-        // /releases/latest ignora prereleases; si solo hay prereleases se usa la más reciente.
-        var release = await GetJsonAsync($"https://api.github.com/repos/{repo}/releases/latest") is { } latest
-            ? ParseRelease(repo, latest)
-            : await GetJsonAsync($"https://api.github.com/repos/{repo}/releases?per_page=1") is { ValueKind: JsonValueKind.Array } list && list.GetArrayLength() > 0
-                ? ParseRelease(repo, list[0])
-                : null;
-
-        lock (Cache) Cache[repo] = (DateTime.UtcNow, release);
+        lock (Cache)
+        {
+            Cache[repo] = new CachedRelease(DateTime.UtcNow, release);
+            SaveCache();
+        }
         return release;
+    }
+
+    private static Dictionary<string, CachedRelease> LoadCache() =>
+        new(JsonStore.Load<Dictionary<string, CachedRelease>>(CachePath) ?? [], StringComparer.OrdinalIgnoreCase);
+
+    private static void SaveCache()
+    {
+        try
+        {
+            JsonStore.Save(CachePath, Cache);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // La caché es una optimización: si no se puede escribir, se sigue sin ella.
+            Log.Error("Guardar caché de GitHub", ex);
+        }
     }
 
     public static async Task DownloadAsync(GitHubAsset asset, string destination, IProgress<double> progress)
@@ -97,8 +130,14 @@ public static partial class GitHubService
     {
         using var response = await Http.GetAsync(url);
         if (response.StatusCode == HttpStatusCode.NotFound) return null;
-        if (response.StatusCode == HttpStatusCode.Forbidden || (int)response.StatusCode == 429)
-            throw new HttpRequestException(Loc.T("err.rateLimit"));
+        var outOfQuota = response.Headers.TryGetValues("X-RateLimit-Remaining", out var remaining) && remaining.FirstOrDefault() == "0";
+        if ((int)response.StatusCode == 429 || (response.StatusCode == HttpStatusCode.Forbidden && outOfQuota))
+        {
+            DateTimeOffset? reset = response.Headers.TryGetValues("X-RateLimit-Reset", out var r) && long.TryParse(r.FirstOrDefault(), out var epoch)
+                ? DateTimeOffset.FromUnixTimeSeconds(epoch)
+                : null;
+            throw new GitHubRateLimitException(reset);
+        }
         response.EnsureSuccessStatusCode();
         using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         return doc.RootElement.Clone();
@@ -122,3 +161,7 @@ public static partial class GitHubService
     [GeneratedRegex(@"^(?:https?://)?(?:www\.)?(?:github\.com/)?([\w.-]+)/([\w.-]+)", RegexOptions.IgnoreCase)]
     private static partial Regex RepoRegex();
 }
+
+/// <summary>Sin cuenta, GitHub permite 60 peticiones por hora e IP; el mensaje dice cuándo se recupera.</summary>
+public sealed class GitHubRateLimitException(DateTimeOffset? resetAt)
+    : HttpRequestException(Loc.T("err.rateLimit", resetAt?.ToLocalTime().ToString("t", Loc.Instance.Culture) ?? "?"));

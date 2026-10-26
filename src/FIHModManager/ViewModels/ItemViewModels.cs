@@ -74,7 +74,7 @@ public sealed class CatalogItemViewModel(CatalogEntry entry) : ObservableObject
 {
     private GitHubRelease? _release;
     private bool _loading = true;
-    private string? _error;
+    private bool _failed;
     private ModItemViewModel? _installed;
 
     public CatalogEntry Entry { get; } = entry;
@@ -100,7 +100,15 @@ public sealed class CatalogItemViewModel(CatalogEntry entry) : ObservableObject
             if (Set(ref _loading, value)) Refresh();
         }
     }
-    public string? Error { get => _error; set => Set(ref _error, value); }
+    /// <summary>La consulta falló: no se sabe si hay releases (el motivo se muestra una vez arriba).</summary>
+    public bool Failed
+    {
+        get => _failed;
+        set
+        {
+            if (Set(ref _failed, value)) Refresh();
+        }
+    }
 
     public ModItemViewModel? Installed
     {
@@ -111,7 +119,7 @@ public sealed class CatalogItemViewModel(CatalogEntry entry) : ObservableObject
         }
     }
 
-    public string LatestText => Release is null ? Loc.T(Loading ? "cat.loading" : "cat.noReleases") : Release.Tag;
+    public string LatestText => Release?.Tag ?? (Loading ? Loc.T("cat.loading") : Failed ? "—" : Loc.T("cat.noReleases"));
     public bool IsInstalled => Installed is not null;
     public bool CanUpdate => Installed?.Source is { } s && Release is not null && !string.Equals(s.Tag, Release.Tag, StringComparison.OrdinalIgnoreCase);
 

@@ -193,7 +193,7 @@
   "err.empty": "Archiwum jest puste.",
   "err.zipSlip": "Podejrzany wpis w pliku zip: {0}",
   "err.recycle": "Nie udało się przenieść do Kosza ({0}). Czy gra jest otwarta?",
-  "err.rateLimit": "GitHub ograniczył zapytania (60/godz. bez konta). Spróbuj ponownie za chwilę.",
+  "err.rateLimit": "GitHub pozwala na 60 zapytań na godzinę z twojego połączenia i limit został wyczerpany. Znów zadziała o {0}.",
   "err.noBundle": "Nie znaleziono wbudowanego BepInEx w pliku wykonywalnym.",
   "err.unexpected": "Wystąpił nieoczekiwany błąd:\n\n{0}\n\nSzczegóły w {1}"
 }

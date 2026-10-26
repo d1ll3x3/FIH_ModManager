@@ -414,6 +414,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         UnauthorizedAccessException => Loc.T("err.noPermission"),
         IOException io when io.HResult == unchecked((int)0x80070020) => Loc.T("err.fileInUse"),
+        GitHubRateLimitException rateLimit => rateLimit.Message,
         HttpRequestException http => Loc.T("err.network", http.Message),
         _ => ex.Message,
     };

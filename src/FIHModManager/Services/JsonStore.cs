@@ -26,7 +26,7 @@ public static class JsonStore
 
     public static void SaveState(GameInstall game, ManagerState state) => Save(StatePath(game), state);
 
-    private static T? Load<T>(string path) where T : class
+    internal static T? Load<T>(string path) where T : class
     {
         if (!File.Exists(path)) return null;
         try
@@ -42,7 +42,7 @@ public static class JsonStore
         }
     }
 
-    private static void Save<T>(string path, T value)
+    internal static void Save<T>(string path, T value)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         var tmp = path + ".tmp";
