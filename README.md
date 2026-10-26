@@ -28,11 +28,13 @@ update and configure mods without touching the game files by hand.
 
 ## Installation
 
-1. Install the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)
-   (x64) if you don't have it.
-2. Download `FIHModManager.exe` from the
-   [latest release](https://github.com/d1ll3x3/FIH_ModManager/releases/latest) and run it.
-   No installer is needed.
+Download `FIHModManager.exe` from the
+[latest release](https://github.com/d1ll3x3/FIH_ModManager/releases/latest) and run it.
+It is a single self-contained file for Windows 10/11 x64: no installer and no .NET runtime
+needed.
+
+Steam installs are found on any drive. Non-Steam copies are found through a desktop shortcut,
+or can be added from Settings > Add folder.
 
 ## How files are organised
 
@@ -51,7 +53,7 @@ enabling them restores the `.dll` extension.
 Requires the .NET 10 SDK.
 
 ```
-dotnet publish src/FIHModManager -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish
+dotnet publish src/FIHModManager -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish
 ```
 
 Translations live in `src/FIHModManager/Resources/Lang/<code>.json`; missing keys fall back to
