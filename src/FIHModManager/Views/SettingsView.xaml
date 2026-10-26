@@ -1,0 +1,94 @@
+<UserControl x:Class="FIHModManager.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:FIHModManager.Infrastructure"
+             xmlns:models="clr-namespace:FIHModManager.Models"
+             Style="{StaticResource PageStyle}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="32,4,32,32">
+            <TextBlock Text="{loc:Tr nav.settings}" Style="{StaticResource H1}" />
+            <TextBlock Text="{loc:Tr settings.subtitle}" Style="{StaticResource Muted}" Margin="0,2,0,0" />
+
+            <Border Style="{StaticResource Card}" Margin="0,20,0,0">
+                <DockPanel>
+                    <ComboBox DockPanel.Dock="Right" Width="220" VerticalAlignment="Center"
+                              ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}" />
+                    <StackPanel>
+                        <TextBlock Text="{loc:Tr settings.language}" Style="{StaticResource H2}" />
+                        <TextBlock Text="{loc:Tr settings.language.text}" Style="{StaticResource Muted}" FontSize="12" Margin="0,2,0,0" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,20,0,0">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,14">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <Button Style="{StaticResource IconButton}" Content="&#xE72C;" ToolTip="{loc:Tr settings.rescan.tip}" Command="{Binding RefreshCommand}" />
+                            <Button Content="{loc:Tr settings.addFolder}" Command="{Binding AddGameFolderCommand}" Margin="8,0,0,0" />
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock Text="{loc:Tr settings.installs.title}" Style="{StaticResource H2}" />
+                            <TextBlock Text="{loc:Tr settings.installs.text}" Style="{StaticResource Muted}" FontSize="12" Margin="0,2,0,0" />
+                        </StackPanel>
+                    </DockPanel>
+
+                    <ItemsControl ItemsSource="{Binding Games}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type models:GameInstall}">
+                                <Border Background="{StaticResource Surface2Brush}" CornerRadius="10" Padding="14,10" Margin="0,0,0,6">
+                                    <DockPanel>
+                                        <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Content="&#xE74D;" ToolTip="{loc:Tr settings.remove.tip}"
+                                                Command="{Binding DataContext.RemoveGameCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                                        <Border DockPanel.Dock="Right" Style="{StaticResource Badge}" Margin="0,0,10,0">
+                                            <TextBlock>
+                                                <TextBlock.Text>
+                                                    <MultiBinding Converter="{StaticResource TrKey}" ConverterParameter="origin.">
+                                                        <Binding Path="Origin" />
+                                                        <Binding Source="{x:Static loc:Loc.Instance}" Path="Language" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </Border>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Name}" Style="{StaticResource LtrText}" FontWeight="SemiBold" />
+                                            <TextBlock Text="{Binding Path}" Style="{StaticResource LtrText}" FontSize="12" Foreground="{StaticResource MutedBrush}" TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,16,0,0">
+                <StackPanel>
+                    <TextBlock Text="{loc:Tr settings.files.title}" Style="{StaticResource H2}" Margin="0,0,0,10" />
+                    <TextBlock Style="{StaticResource Muted}" FontSize="12" LineHeight="20">
+                        <Run Text="{loc:Tr settings.files.1}" /><LineBreak />
+                        <Run Text="{loc:Tr settings.files.2}" /><LineBreak />
+                        <Run Text="{loc:Tr settings.files.3}" /><LineBreak />
+                        <Run Text="{loc:Tr settings.files.4}" /><LineBreak />
+                        <Run Text="{loc:Tr settings.files.5}" />
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,16,0,0">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="{loc:Tr upd.check}" Command="{Binding CheckAppUpdateCommand}" VerticalAlignment="Center" />
+                    <Border Width="44" Height="44" CornerRadius="11">
+                        <Border.Background>
+                            <ImageBrush ImageSource="/Resources/icon.png" Stretch="UniformToFill" />
+                        </Border.Background>
+                    </Border>
+                    <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding AppVersionText}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding BundledText}" Style="{StaticResource Muted}" FontSize="12" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,68 @@
+<UserControl x:Class="FIHModManager.Views.ProfilesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:FIHModManager.Infrastructure"
+             xmlns:vm="clr-namespace:FIHModManager.ViewModels"
+             Style="{StaticResource PageStyle}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="32,4,32,32">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryButton}" Command="{Binding SaveProfileCommand}" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource Icon}" Text="&#xE74E;" FontSize="13" Margin="0,0,8,0" />
+                        <TextBlock Text="{loc:Tr profiles.saveCurrent}" />
+                    </StackPanel>
+                </Button>
+                <StackPanel>
+                    <TextBlock Text="{loc:Tr nav.profiles}" Style="{StaticResource H1}" />
+                    <TextBlock Text="{loc:Tr profiles.subtitle}" Style="{StaticResource Muted}" Margin="0,2,0,0" />
+                </StackPanel>
+            </DockPanel>
+
+            <Border Style="{StaticResource Card}" Margin="0,20,0,0" Padding="32"
+                    Visibility="{Binding Profiles.Count, Converter={StaticResource InvBoolToVis}}">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Style="{StaticResource Icon}" Text="&#xE77B;" FontSize="40" Foreground="{StaticResource MutedBrush}" />
+                    <TextBlock Text="{loc:Tr profiles.empty.title}" Style="{StaticResource H2}" HorizontalAlignment="Center" Margin="0,14,0,6" />
+                    <TextBlock Text="{loc:Tr profiles.empty.text}" Style="{StaticResource Muted}" HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <ItemsControl ItemsSource="{Binding Profiles}" Margin="0,20,0,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:ProfileItemViewModel}">
+                        <Border Style="{StaticResource Card}" Margin="0,0,0,10" Padding="18,16">
+                            <DockPanel>
+                                <Border DockPanel.Dock="Left" Width="44" Height="44" CornerRadius="12" Background="{StaticResource Accent2SoftBrush}" VerticalAlignment="Top">
+                                    <TextBlock Style="{StaticResource Icon}" Text="&#xE77B;" FontSize="18" Foreground="{StaticResource Accent2Brush}" />
+                                </Border>
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Style="{StaticResource PrimaryButton}" Content="{loc:Tr profiles.apply}" Margin="0,0,6,0"
+                                            Command="{Binding DataContext.ApplyProfileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                                    <Button Style="{StaticResource IconButton}" Content="&#xE895;" ToolTip="{loc:Tr profiles.overwrite.tip}"
+                                            Command="{Binding DataContext.OverwriteProfileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                                    <Button Style="{StaticResource IconButton}" Content="&#xE74D;" ToolTip="{loc:Tr profiles.delete.tip}"
+                                            Command="{Binding DataContext.DeleteProfileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                                </StackPanel>
+                                <StackPanel Margin="14,0,14,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Name}" Style="{StaticResource H2}" Margin="0,0,10,0" />
+                                        <Border Style="{StaticResource Badge}">
+                                            <TextBlock Text="{Binding Summary}" />
+                                        </Border>
+                                        <Border Style="{StaticResource Badge}" Background="{StaticResource WarningSoftBrush}"
+                                                Visibility="{Binding MissingCount, Converter={StaticResource BoolToVis}}">
+                                            <TextBlock Text="{Binding MissingText}" Foreground="{StaticResource WarningBrush}" />
+                                        </Border>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding ModsText}" Style="{StaticResource Muted}" FontSize="12" Margin="0,6,0,0" />
+                                    <TextBlock Text="{Binding SavedText}" FontSize="11" Foreground="#6E6E88" Margin="0,4,0,0" />
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

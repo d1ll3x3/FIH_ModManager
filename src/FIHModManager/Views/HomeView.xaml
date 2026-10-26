@@ -1,0 +1,171 @@
+<UserControl x:Class="FIHModManager.Views.HomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:FIHModManager.Infrastructure"
+             Style="{StaticResource PageStyle}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="32,4,32,32">
+
+            <!-- Sin juego -->
+            <Border Style="{StaticResource Card}" Visibility="{Binding HasGame, Converter={StaticResource InvBoolToVis}}" Padding="32">
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Style="{StaticResource Icon}" Text="&#xE7FC;" FontSize="40" Foreground="{StaticResource MutedBrush}" />
+                    <TextBlock Text="{loc:Tr home.noGame.title}" Style="{StaticResource H2}" Margin="0,14,0,6" HorizontalAlignment="Center" />
+                    <TextBlock Text="{loc:Tr home.noGame.text}" Style="{StaticResource Muted}" HorizontalAlignment="Center" />
+                    <Button Style="{StaticResource PrimaryButton}" Content="{loc:Tr home.addFolder}" Margin="0,18,0,0" HorizontalAlignment="Center"
+                            Command="{Binding AddGameFolderCommand}" />
+                </StackPanel>
+            </Border>
+
+            <StackPanel Visibility="{Binding HasGame, Converter={StaticResource BoolToVis}}">
+                <!-- Hero -->
+                <Border CornerRadius="18" Background="{StaticResource HeroGradient}" ClipToBounds="True">
+                    <Grid>
+                        <!-- Personaje del icono como marca de agua -->
+                        <Border Width="230" Height="230" HorizontalAlignment="Right" Margin="0,-20,-20,-40" Opacity="0.22" CornerRadius="40">
+                            <Border.Background>
+                                <ImageBrush ImageSource="/Resources/icon.png" Stretch="UniformToFill" />
+                            </Border.Background>
+                        </Border>
+                        <StackPanel Margin="30,28">
+                            <TextBlock Text="{loc:Tr home.ready}" FontSize="11" FontWeight="Bold" Foreground="#CCFFFFFF" />
+                            <TextBlock Text="{Binding SelectedGame.Name}" Style="{StaticResource LtrText}" FontSize="28" FontWeight="Bold" Margin="0,6,0,4" TextTrimming="CharacterEllipsis" MaxWidth="560" HorizontalAlignment="Left" />
+                            <TextBlock Text="{Binding SelectedGame.Path}" Style="{StaticResource LtrText}" FontSize="12" Foreground="#AAFFFFFF" TextTrimming="CharacterEllipsis" MaxWidth="560" HorizontalAlignment="Left" />
+                            <StackPanel Orientation="Horizontal" Margin="0,22,0,0">
+                                <Button Style="{StaticResource PrimaryButton}" Command="{Binding PlayCommand}" Padding="26,12">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Style="{StaticResource Icon}" Text="&#xE768;" Margin="0,0,10,0" />
+                                        <TextBlock Text="{loc:Tr home.playMods}" FontSize="14" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Command="{Binding PlayVanillaCommand}" Margin="10,0,0,0" Padding="18,12" Background="#33FFFFFF" BorderBrush="#33FFFFFF"
+                                        ToolTip="{loc:Tr home.playVanilla.tip}">
+                                    <TextBlock Text="{loc:Tr home.playVanilla}" />
+                                </Button>
+                                <Button Command="{Binding OpenGameFolderCommand}" Margin="10,0,0,0" Padding="14,12" Background="#33FFFFFF" BorderBrush="#33FFFFFF"
+                                        ToolTip="{loc:Tr home.openFolder.tip}">
+                                    <TextBlock Style="{StaticResource Icon}" Text="&#xE8B7;" />
+                                </Button>
+                            </StackPanel>
+                            <TextBlock Text="{loc:Tr home.alreadyRunning}" FontSize="12" Foreground="#CCFFFFFF" Margin="0,10,0,0"
+                                       Visibility="{Binding IsGameRunning, Converter={StaticResource BoolToVis}}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Tarjetas -->
+                <Grid Margin="0,18,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.6*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- BepInEx -->
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <DockPanel>
+                                <Border x:Name="BepIcon" Width="44" Height="44" CornerRadius="12" DockPanel.Dock="Left">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="{StaticResource WarningSoftBrush}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding BepInExNeedsInstall}" Value="False">
+                                                    <Setter Property="Background" Value="{StaticResource SuccessSoftBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock FontSize="20">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource Icon}">
+                                                <Setter Property="Text" Value="&#xE7BA;" />
+                                                <Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding BepInExNeedsInstall}" Value="False">
+                                                        <Setter Property="Text" Value="&#xE73E;" />
+                                                        <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Border>
+                                <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding BepInExStatusText}" Style="{StaticResource H2}" />
+                                    <TextBlock Text="{Binding BepInExDetailText}" Style="{StaticResource Muted}" Margin="0,2,0,0" />
+                                </StackPanel>
+                            </DockPanel>
+
+                            <Border Background="{StaticResource Accent2SoftBrush}" CornerRadius="10" Padding="12,10" Margin="0,16,0,0"
+                                    Visibility="{Binding FirstLaunchPending, Converter={StaticResource BoolToVis}}">
+                                <DockPanel>
+                                    <TextBlock Style="{StaticResource Icon}" Text="&#xE946;" Foreground="{StaticResource Accent2Brush}" Margin="0,0,10,0" VerticalAlignment="Top" />
+                                    <TextBlock TextWrapping="Wrap" FontSize="12"
+                                               Text="{loc:Tr home.firstLaunch}" />
+                                </DockPanel>
+                            </Border>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,18,0,0">
+                                <Button Command="{Binding InstallBepInExCommand}" Margin="0,0,10,0">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource BaseButton}">
+                                            <Setter Property="Content" Value="{loc:Tr common.reinstall}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding BepInExNeedsInstall}" Value="True">
+                                                    <Setter Property="Background" Value="{StaticResource AccentGradient}" />
+                                                    <Setter Property="BorderThickness" Value="0" />
+                                                    <Setter Property="Foreground" Value="White" />
+                                                    <Setter Property="Content" Value="{loc:Tr home.installBep}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding BepInExOutdated}" Value="True">
+                                                    <Setter Property="Background" Value="{StaticResource AccentGradient}" />
+                                                    <Setter Property="BorderThickness" Value="0" />
+                                                    <Setter Property="Foreground" Value="White" />
+                                                    <Setter Property="Content" Value="{loc:Tr home.updateBep}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                                <Button Style="{StaticResource DangerButton}" Content="{loc:Tr common.uninstall}" Command="{Binding UninstallBepInExCommand}"
+                                        Visibility="{Binding BepInExInstalled, Converter={StaticResource BoolToVis}}" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding BundledText}" Style="{StaticResource Muted}" FontSize="11" Margin="0,12,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Resumen de mods -->
+                    <Border Grid.Column="2" Style="{StaticResource Card}">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Top" Text="{loc:Tr home.mods}" Style="{StaticResource H2}" />
+                            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,16,0,0">
+                                <Button Content="{loc:Tr home.manage}" Command="{Binding NavigateCommand}" CommandParameter="Mods" Margin="0,0,10,0" />
+                                <Button Style="{StaticResource GhostButton}" Content="{loc:Tr nav.explore}" Command="{Binding NavigateCommand}" CommandParameter="Explore" />
+                            </StackPanel>
+                            <StackPanel VerticalAlignment="Center" Margin="0,12,0,0">
+                                <TextBlock FontSize="38" FontWeight="Bold">
+                                    <Run Text="{Binding EnabledModCount, Mode=OneWay}" /><Run Text="/" Foreground="{StaticResource MutedBrush}" /><Run Text="{Binding Mods.Count, Mode=OneWay}" Foreground="{StaticResource MutedBrush}" />
+                                </TextBlock>
+                                <TextBlock Text="{loc:Tr home.enabled}" Style="{StaticResource Muted}" />
+                                <Border Background="{StaticResource AccentSoftBrush}" CornerRadius="8" Padding="10,6" Margin="0,10,0,0" HorizontalAlignment="Left"
+                                        Visibility="{Binding UpdateCount, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="{Binding UpdatesText}" FontSize="12" FontWeight="SemiBold" />
+                                </Border>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Consejos -->
+                <Border Style="{StaticResource Card}" Margin="0,16,0,0" Padding="20,16">
+                    <DockPanel>
+                        <TextBlock Style="{StaticResource Icon}" Text="&#xE82F;" Foreground="{StaticResource WarningBrush}" Margin="0,0,14,0" />
+                        <TextBlock Style="{StaticResource Muted}"
+                                   Text="{loc:Tr home.tip}" />
+                    </DockPanel>
+                </Border>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
