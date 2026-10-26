@@ -224,7 +224,10 @@ public sealed partial class MainViewModel : ObservableObject
             return;
         }
 
-        var notes = release.Body.Length > 600 ? release.Body[..600] + "…" : release.Body;
+        // Las notas de GitHub vienen en Markdown; el diálogo es texto plano.
+        var plain = System.Text.RegularExpressions.Regex.Replace(release.Body, @"\*\*|`|^#+\s*", "",
+            System.Text.RegularExpressions.RegexOptions.Multiline).Trim();
+        var notes = plain.Length > 600 ? plain[..600] + "…" : plain;
         var ok = await ShowDialogAsync(new DialogViewModel
         {
             Title = Loc.T("upd.available.title", release.Tag),
