@@ -70,6 +70,8 @@ public sealed class ModItemViewModel(ModEntry entry, ModSource? source, string? 
         || Entry.Key.Contains(filter, StringComparison.OrdinalIgnoreCase);
 }
 
+public sealed record CatalogGroup(string Author, IReadOnlyList<CatalogItemViewModel> Items);
+
 public sealed class CatalogItemViewModel(CatalogEntry entry) : ObservableObject
 {
     private GitHubRelease? _release;

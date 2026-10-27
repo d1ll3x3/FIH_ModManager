@@ -1,7 +1,7 @@
 <Project>
   <!-- Común a Core, la app WPF (Windows) y la app Avalonia (Linux): una sola versión para la autoactualización. -->
   <PropertyGroup>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Product>FIH Mod Manager</Product>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

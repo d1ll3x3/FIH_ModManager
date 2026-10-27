@@ -18,17 +18,20 @@ public static partial class GitHubService
 
     public sealed record CachedRelease(DateTime FetchedAt, GitHubRelease? Release);
 
-    /// <summary>Mods de Flipping is Hard que aparecen en "Explorar".</summary>
+    /// <summary>Mods de Flipping is Hard que aparecen en "Explorar", agrupados por autor en el orden de esta lista.</summary>
     public static readonly IReadOnlyList<CatalogEntry> Catalog =
     [
-        new("d1ll3x3/FIH_MapEditor", "Map Editor", "edit"),
-        new("d1ll3x3/FlippingIsHard_TAS_Tool", "TAS Tool", "timer"),
-        new("d1ll3x3/SkinChanger_FlippingIsHard", "Charm Replacer", "palette"),
-        new("d1ll3x3/FlippingIsHard-Trainer-BepInEx", "Trainer", "flight"),
-        new("d1ll3x3/FIH_Ghost", "Ghost", "person"),
-        new("d1ll3x3/ChaosIsHard", "Chaos is Hard", "bolt"),
-        new("d1ll3x3/ChainedIsHard", "Chained is Hard", "link"),
-        new("d1ll3x3/FirstPersonIsHard", "First Person", "visibility"),
+        new("d1ll3x3/FIH_MapEditor", "Map Editor", "edit", "Topper"),
+        new("d1ll3x3/FlippingIsHard_TAS_Tool", "TAS Tool", "timer", "Topper"),
+        new("d1ll3x3/SkinChanger_FlippingIsHard", "Charm Replacer", "palette", "Topper"),
+        new("d1ll3x3/FlippingIsHard-Trainer-BepInEx", "Trainer", "flight", "Topper"),
+        new("d1ll3x3/FIH_Ghost", "Ghost", "person", "Topper"),
+        new("d1ll3x3/ChaosIsHard", "Chaos is Hard", "bolt", "Topper"),
+        new("d1ll3x3/ChainedIsHard", "Chained is Hard", "link", "Topper"),
+        new("d1ll3x3/FirstPersonIsHard", "First Person", "visibility", "Topper"),
+        new("GamingGamer115/FIH-Korean-Translator", "Korean Translator", "translate", "Gaming_Gamer"),
+        new("GamingGamer115/FIH-Photo-Mode", "Photo Mode", "camera", "Gaming_Gamer"),
+        new("GamingGamer115/FIH-Text-Chat", "Text Chat", "chat", "Gaming_Gamer"),
     ];
 
     private static HttpClient CreateClient()

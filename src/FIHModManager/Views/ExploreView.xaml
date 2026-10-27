@@ -38,67 +38,79 @@
 
             <TextBlock Text="{loc:Tr explore.section}" Style="{StaticResource H2}" Margin="2,26,0,12" />
 
-            <ItemsControl ItemsSource="{Binding Catalog}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="2" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+            <ItemsControl ItemsSource="{Binding CatalogGroups}">
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type vm:CatalogItemViewModel}">
-                        <Border x:Name="Card" Style="{StaticResource Card}" Margin="0,0,12,12" Padding="18">
-                            <DockPanel>
-                                <DockPanel DockPanel.Dock="Bottom" Margin="0,16,0,0">
-                                    <Button DockPanel.Dock="Right" Content="{Binding ActionText}"
-                                            Command="{Binding DataContext.InstallCatalogCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
-                                        <Button.Style>
-                                            <Style TargetType="Button" BasedOn="{StaticResource BaseButton}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsInstalled}" Value="False">
-                                                        <Setter Property="Background" Value="{StaticResource AccentGradient}" />
-                                                    <Setter Property="BorderThickness" Value="0" />
-                                                    <Setter Property="Foreground" Value="White" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding CanUpdate}" Value="True">
-                                                        <Setter Property="Background" Value="{StaticResource AccentGradient}" />
-                                                    <Setter Property="BorderThickness" Value="0" />
-                                                    <Setter Property="Foreground" Value="White" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Button.Style>
-                                    </Button>
-                                    <Button DockPanel.Dock="Left" Style="{StaticResource GhostButton}" Padding="8,6" ToolTip="{loc:Tr explore.viewOnGitHub}"
-                                            Command="{Binding DataContext.OpenRepoCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Repo}">
-                                        <TextBlock Text="{Binding Repo}" FontWeight="Normal" FontSize="12" Foreground="{StaticResource MutedBrush}" />
-                                    </Button>
-                                    <Border />
-                                </DockPanel>
+                    <DataTemplate DataType="{x:Type vm:CatalogGroup}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="2,6,0,12">
+                                <TextBlock Style="{StaticResource Icon}" Text="&#xE77B;" FontSize="14" Foreground="{StaticResource MutedBrush}" Margin="0,0,8,0" />
+                                <TextBlock Text="{Binding Author}" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource MutedBrush}" />
+                            </StackPanel>
+                            <ItemsControl ItemsSource="{Binding Items}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="2" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:CatalogItemViewModel}">
+                                        <Border x:Name="Card" Style="{StaticResource Card}" Margin="0,0,12,12" Padding="18">
+                                            <DockPanel>
+                                                <DockPanel DockPanel.Dock="Bottom" Margin="0,16,0,0">
+                                                    <Button DockPanel.Dock="Right" Content="{Binding ActionText}"
+                                                            Command="{Binding DataContext.InstallCatalogCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
+                                                        <Button.Style>
+                                                            <Style TargetType="Button" BasedOn="{StaticResource BaseButton}">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsInstalled}" Value="False">
+                                                                        <Setter Property="Background" Value="{StaticResource AccentGradient}" />
+                                                                    <Setter Property="BorderThickness" Value="0" />
+                                                                    <Setter Property="Foreground" Value="White" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding CanUpdate}" Value="True">
+                                                                        <Setter Property="Background" Value="{StaticResource AccentGradient}" />
+                                                                    <Setter Property="BorderThickness" Value="0" />
+                                                                    <Setter Property="Foreground" Value="White" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                    </Button>
+                                                    <Button DockPanel.Dock="Left" Style="{StaticResource GhostButton}" Padding="8,6" ToolTip="{loc:Tr explore.viewOnGitHub}"
+                                                            Command="{Binding DataContext.OpenRepoCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Repo}">
+                                                        <TextBlock Text="{Binding Repo}" FontWeight="Normal" FontSize="12" Foreground="{StaticResource MutedBrush}" />
+                                                    </Button>
+                                                    <Border />
+                                                </DockPanel>
 
-                                <Border DockPanel.Dock="Left" Width="46" Height="46" CornerRadius="12" Background="{StaticResource AccentGradient}" VerticalAlignment="Top">
-                                    <TextBlock Style="{StaticResource Icon}" Text="{Binding Icon, Converter={StaticResource IconGlyph}}" FontSize="20" Foreground="White" />
-                                </Border>
+                                                <Border DockPanel.Dock="Left" Width="46" Height="46" CornerRadius="12" Background="{StaticResource AccentGradient}" VerticalAlignment="Top">
+                                                    <TextBlock Style="{StaticResource Icon}" Text="{Binding Icon, Converter={StaticResource IconGlyph}}" FontSize="20" Foreground="White" />
+                                                </Border>
 
-                                <StackPanel Margin="14,0,0,0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding Title}" Style="{StaticResource H2}" Margin="0,0,10,0" />
-                                        <Border Style="{StaticResource Badge}">
-                                            <TextBlock Text="{Binding LatestText}" />
+                                                <StackPanel Margin="14,0,0,0">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Title}" Style="{StaticResource H2}" Margin="0,0,10,0" />
+                                                        <Border Style="{StaticResource Badge}">
+                                                            <TextBlock Text="{Binding LatestText}" />
+                                                        </Border>
+                                                        <Border Style="{StaticResource Badge}" Background="{StaticResource SuccessSoftBrush}"
+                                                                Visibility="{Binding IsInstalled, Converter={StaticResource BoolToVis}}">
+                                                            <TextBlock Text="{loc:Tr explore.installed}" Foreground="{StaticResource SuccessBrush}" />
+                                                        </Border>
+                                                    </StackPanel>
+                                                    <TextBlock Text="{Binding Description}" Style="{StaticResource Muted}" Margin="0,6,0,0" />
+                                                </StackPanel>
+                                            </DockPanel>
                                         </Border>
-                                        <Border Style="{StaticResource Badge}" Background="{StaticResource SuccessSoftBrush}"
-                                                Visibility="{Binding IsInstalled, Converter={StaticResource BoolToVis}}">
-                                            <TextBlock Text="{loc:Tr explore.installed}" Foreground="{StaticResource SuccessBrush}" />
-                                        </Border>
-                                    </StackPanel>
-                                    <TextBlock Text="{Binding Description}" Style="{StaticResource Muted}" Margin="0,6,0,0" />
-                                </StackPanel>
-                            </DockPanel>
-                        </Border>
-                        <DataTemplate.Triggers>
-                            <DataTrigger Binding="{Binding CanUpdate}" Value="True">
-                                <Setter TargetName="Card" Property="BorderBrush" Value="#66E0344B" />
-                            </DataTrigger>
-                        </DataTemplate.Triggers>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding CanUpdate}" Value="True">
+                                                <Setter TargetName="Card" Property="BorderBrush" Value="#66E0344B" />
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

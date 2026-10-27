@@ -54,6 +54,9 @@ public sealed class IconGlyphConverter : IValueConverter
         ["bolt"] = "\uE945",
         ["link"] = "\uE71B",
         ["visibility"] = "\uE7B3",
+        ["translate"] = "\uF2B7",
+        ["camera"] = "\uE722",
+        ["chat"] = "\uE8F2",
     };
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>

@@ -74,4 +74,4 @@ public sealed record GitHubAsset(string Name, string DownloadUrl, long Size);
 public sealed record GitHubRelease(string Repo, string Tag, string Name, string Body, DateTime PublishedAt, string HtmlUrl, IReadOnlyList<GitHubAsset> Assets);
 
 /// <summary>Icon es un nombre neutro ("edit", "timer"…); cada interfaz lo traduce a su fuente de iconos.</summary>
-public sealed record CatalogEntry(string Repo, string Title, string Icon);
+public sealed record CatalogEntry(string Repo, string Title, string Icon, string Author);

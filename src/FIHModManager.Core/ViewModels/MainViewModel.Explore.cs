@@ -13,6 +13,8 @@ public sealed partial class MainViewModel
 
     public ObservableCollection<CatalogItemViewModel> Catalog { get; } = [];
 
+    public IReadOnlyList<CatalogGroup> CatalogGroups { get; private set; } = [];
+
     public string RepoInput { get => _repoInput; set => Set(ref _repoInput, value); }
 
     public string? CatalogError { get => _catalogError; private set => Set(ref _catalogError, value); }
@@ -25,6 +27,7 @@ public sealed partial class MainViewModel
     private void InitExplore()
     {
         foreach (var entry in GitHubService.Catalog) Catalog.Add(new CatalogItemViewModel(entry));
+        CatalogGroups = Catalog.GroupBy(c => c.Entry.Author).Select(g => new CatalogGroup(g.Key, g.ToList())).ToList();
 
         InstallCatalogCommand = new AsyncCommand(p => InstallFromRepoAsync(((CatalogItemViewModel)p!).Repo, forceRefresh: false), _ => HasGame && !IsBusy);
         InstallRepoInputCommand = new AsyncCommand(InstallFromInputAsync, () => HasGame && !IsBusy && !string.IsNullOrWhiteSpace(RepoInput));
