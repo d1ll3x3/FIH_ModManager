@@ -57,6 +57,7 @@ public sealed class IconGlyphConverter : IValueConverter
         ["translate"] = "\uF2B7",
         ["camera"] = "\uE722",
         ["chat"] = "\uE8F2",
+        ["image"] = "\uE91B",
     };
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>

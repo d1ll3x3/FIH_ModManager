@@ -107,6 +107,7 @@ public static class Icons
         ["translate"] = "",
         ["camera"] = "",
         ["chat"] = "",
+        ["image"] = "",
     };
 
     public static string ForCatalog(string? name) => name is not null && Catalog.TryGetValue(name, out var g) ? g : Mods;

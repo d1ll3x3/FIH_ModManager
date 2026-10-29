@@ -1,0 +1,93 @@
+# Al subir un tag vX.Y.Z compila las dos versiones, firma el exe de Windows con SignPath
+# y deja una release en borrador con los dos ejecutables, lista para escribir las notas y publicar.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  actions: read
+
+env:
+  PUBLISH_ARGS: -c Release --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      # La autoactualización compara el tag con la versión del ensamblado: si no coinciden,
+      # el programa ofrecería actualizarse una y otra vez.
+      - name: Check tag matches Version
+        shell: pwsh
+        run: |
+          $version = ([xml](Get-Content src/Directory.Build.props)).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+          if ("v$version" -ne $env:GITHUB_REF_NAME) { throw "Tag $env:GITHUB_REF_NAME does not match Version $version in src/Directory.Build.props" }
+
+      - run: dotnet publish src/FIHModManager -r win-x64 ${{ env.PUBLISH_ARGS }} -o publish/windows
+
+      - id: unsigned
+        uses: actions/upload-artifact@v5
+        with:
+          name: windows-unsigned
+          path: publish/windows/FIHModManager.exe
+          if-no-files-found: error
+
+      - uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: FIH_ModManager
+          signing-policy-slug: release-signing
+          github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          # La política release-signing requiere aprobar a mano cada firma en SignPath; hay una hora para hacerlo.
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: signed
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: windows
+          path: signed/FIHModManager.exe
+          if-no-files-found: error
+
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet publish src/FIHModManager.Linux -r linux-x64 ${{ env.PUBLISH_ARGS }} -o publish/linux
+      - uses: actions/upload-artifact@v5
+        with:
+          name: linux
+          path: publish/linux/FIHModManager
+          if-no-files-found: error
+
+  release:
+    needs: [windows, linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          name: windows
+          path: windows
+      - uses: actions/download-artifact@v5
+        with:
+          name: linux
+          path: linux
+      # Borrador: /releases/latest no lo ve, así que nadie recibe la actualización hasta publicarlo.
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mv linux/FIHModManager FIHModManager-linux-x64
+          gh release create "$GITHUB_REF_NAME" windows/FIHModManager.exe FIHModManager-linux-x64 \
+            --repo "$GITHUB_REPOSITORY" --draft --verify-tag --title "FIH Mod Manager $GITHUB_REF_NAME" --notes ""

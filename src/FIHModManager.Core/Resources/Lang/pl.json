@@ -84,6 +84,7 @@
   "cat.desc.FIH-Korean-Translator": "Tłumaczy angielskie teksty gry na koreański (Ctrl+K włącza i wyłącza).",
   "cat.desc.FIH-Photo-Mode": "Ukrywanie HUD, zatrzymanie czasu, wolna kamera i regulacja FOV; zrzuty ekranu w PNG.",
   "cat.desc.FIH-Text-Chat": "Czat tekstowy w trybie wieloosobowym z komendami, wzmiankami, autouzupełnianiem i filtrem wulgaryzmów.",
+  "cat.desc.StickerSwap": "Naklej własny obrazek jako naklejkę na tył telefonu (K, aby edytować).",
   "cat.desc.FirstPersonIsHard": "Kamera z pierwszej osoby, która utrzymuje poziomy horyzont, gdy telefon się obraca.",
   "config.subtitle": "Konfiguruj BepInEx i mody bez ręcznej edycji plików .cfg.",
   "config.openFolder.tip": "Otwórz folder config",

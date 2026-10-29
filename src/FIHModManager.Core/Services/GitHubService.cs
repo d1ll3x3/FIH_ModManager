@@ -32,6 +32,7 @@ public static partial class GitHubService
         new("GamingGamer115/FIH-Korean-Translator", "Korean Translator", "translate", "Gaming_Gamer"),
         new("GamingGamer115/FIH-Photo-Mode", "Photo Mode", "camera", "Gaming_Gamer"),
         new("GamingGamer115/FIH-Text-Chat", "Text Chat", "chat", "Gaming_Gamer"),
+        new("fabuleo8796/StickerSwap", "StickerSwap", "image", "Fabuleo8796"),
     ];
 
     private static HttpClient CreateClient()

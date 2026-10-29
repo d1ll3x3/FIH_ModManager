@@ -84,6 +84,7 @@
   "cat.desc.FIH-Korean-Translator": "Traduce al coreano los textos en inglés del juego (Ctrl+K para activarlo).",
   "cat.desc.FIH-Photo-Mode": "Oculta el HUD, congela el tiempo, cámara libre y control del FOV; guarda capturas en PNG.",
   "cat.desc.FIH-Text-Chat": "Chat de texto multijugador con comandos, menciones, autocompletado y filtro de palabrotas.",
+  "cat.desc.StickerSwap": "Pon tu propia imagen como pegatina en la parte trasera del móvil (K para editar).",
   "cat.desc.FirstPersonIsHard": "Cámara en primera persona que mantiene el horizonte mientras el móvil gira.",
   "config.subtitle": "Ajusta BepInEx y tus mods sin abrir los archivos .cfg a mano.",
   "config.openFolder.tip": "Abrir carpeta config",

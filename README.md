@@ -92,6 +92,26 @@ that asset name.
 Translations live in `src/FIHModManager.Core/Resources/Lang/<code>.json`; missing keys fall
 back to English.
 
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by
+[SignPath Foundation](https://signpath.org).
+
+The Windows executable is built by the [release workflow](.github/workflows/release.yml) on
+GitHub Actions from the tagged source and signed there; nothing built on a personal machine is
+signed.
+
+- Committers and reviewers: [d1ll3x3](https://github.com/d1ll3x3)
+- Approvers: [d1ll3x3](https://github.com/d1ll3x3)
+
+## Privacy policy
+
+This program does not collect or send any personal data. It only connects to GitHub
+(`api.github.com` and GitHub's download servers) to check for new releases of itself and of
+the mods listed in Explore, and to download the files you choose to install. These are plain
+requests without an account; GitHub sees the usual request data (IP address, app name and
+version). Settings and logs stay on your computer.
+
 ## License
 
 GNU Affero General Public License v3.0, see [LICENSE](LICENSE). Bundled third-party components
