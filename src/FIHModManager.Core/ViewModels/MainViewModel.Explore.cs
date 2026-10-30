@@ -8,12 +8,33 @@ namespace FIHModManager.ViewModels;
 public sealed partial class MainViewModel
 {
     private string _repoInput = "";
+    private string _catalogFilter = "";
     private string? _catalogError;
     private bool _catalogLoaded;
+    private IReadOnlyList<CatalogGroup> _catalogGroups = [];
 
     public ObservableCollection<CatalogItemViewModel> Catalog { get; } = [];
 
-    public IReadOnlyList<CatalogGroup> CatalogGroups { get; private set; } = [];
+    /// <summary>Catálogo agrupado por autor con la búsqueda aplicada; los autores sin resultados no aparecen.</summary>
+    public IReadOnlyList<CatalogGroup> CatalogGroups
+    {
+        get => _catalogGroups;
+        private set
+        {
+            if (Set(ref _catalogGroups, value)) OnPropertyChanged(nameof(NoCatalogMatches));
+        }
+    }
+
+    public bool NoCatalogMatches => CatalogGroups.Count == 0;
+
+    public string CatalogFilter
+    {
+        get => _catalogFilter;
+        set
+        {
+            if (Set(ref _catalogFilter, value)) RefreshCatalogGroups();
+        }
+    }
 
     public string RepoInput { get => _repoInput; set => Set(ref _repoInput, value); }
 
@@ -27,13 +48,19 @@ public sealed partial class MainViewModel
     private void InitExplore()
     {
         foreach (var entry in GitHubService.Catalog) Catalog.Add(new CatalogItemViewModel(entry));
-        CatalogGroups = Catalog.GroupBy(c => c.Entry.Author).Select(g => new CatalogGroup(g.Key, g.ToList())).ToList();
+        RefreshCatalogGroups();
 
         InstallCatalogCommand = new AsyncCommand(p => InstallFromRepoAsync(((CatalogItemViewModel)p!).Repo, forceRefresh: false), _ => HasGame && !IsBusy);
         InstallRepoInputCommand = new AsyncCommand(InstallFromInputAsync, () => HasGame && !IsBusy && !string.IsNullOrWhiteSpace(RepoInput));
         RefreshCatalogCommand = new AsyncCommand(() => LoadCatalogAsync(force: true));
         OpenRepoCommand = new RelayCommand(p => GameLauncher.OpenUrl($"https://github.com/{p}"));
     }
+
+    private void RefreshCatalogGroups() =>
+        CatalogGroups = Catalog.Where(c => c.Matches(CatalogFilter))
+            .GroupBy(c => c.Entry.Author)
+            .Select(g => new CatalogGroup(g.Key, g.ToList()))
+            .ToList();
 
     private async Task LoadCatalogAsync(bool force)
     {
@@ -144,6 +171,7 @@ public sealed partial class MainViewModel
                 await ReloadModsAsync();
                 foreach (var m in Mods.Where(m => keys.Contains(m.Entry.Key))) m.LatestTag = release.Tag;
                 RaiseModCounts();
+                RefreshFilteredMods();
                 SyncCatalogInstalled();
                 ShowToast(Loc.T("toast.repoInstalled", repo.Split('/')[1], release.Tag), ToastKind.Success);
             }

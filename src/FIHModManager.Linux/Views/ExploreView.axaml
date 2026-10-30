@@ -7,6 +7,11 @@
         <Style Selector="Border.catalog.update">
             <Setter Property="BorderBrush" Value="#66E0344B" />
         </Style>
+        <Style Selector="Button.reinstall">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+        </Style>
     </UserControl.Styles>
     <ScrollViewer>
         <StackPanel Margin="32,4,32,32">
@@ -40,7 +45,16 @@
                 </DockPanel>
             </Border>
 
-            <TextBlock Text="{loc:Tr explore.section}" Classes="h2" Margin="2,26,0,12" />
+            <DockPanel Margin="2,26,0,12">
+                <TextBox DockPanel.Dock="Right" Width="280" Text="{Binding CatalogFilter}" Watermark="{loc:Tr explore.search}">
+                    <TextBox.InnerLeftContent>
+                        <TextBlock Classes="icon" Text="{x:Static loc:Icons.Search}" FontSize="16" Foreground="{StaticResource MutedBrush}" Margin="10,0,0,0" />
+                    </TextBox.InnerLeftContent>
+                </TextBox>
+                <TextBlock Text="{loc:Tr explore.section}" Classes="h2" VerticalAlignment="Center" />
+            </DockPanel>
+
+            <TextBlock Text="{loc:Tr explore.noMatches}" Classes="muted" HorizontalAlignment="Center" Margin="0,24,0,0" IsVisible="{Binding NoCatalogMatches}" />
 
             <ItemsControl ItemsSource="{Binding CatalogGroups}">
                 <ItemsControl.ItemTemplate>
@@ -61,7 +75,9 @@
                                         <Border Classes="card catalog" Margin="0,0,12,12" Padding="18" Classes.update="{Binding CanUpdate}">
                                             <DockPanel>
                                                 <DockPanel DockPanel.Dock="Bottom" Margin="0,16,0,0">
-                                                    <Button DockPanel.Dock="Right" Content="{Binding ActionText}" Classes.primary="{Binding IsPrimaryAction}"
+                                                    <!-- Instalar y Actualizar destacan; Reinstalar queda discreto -->
+                                                    <Button DockPanel.Dock="Right" Content="{Binding ActionText}" ToolTip.Tip="{Binding ManualTip}"
+                                                            Classes.primary="{Binding IsPrimaryAction}" Classes.reinstall="{Binding !IsPrimaryAction}"
                                                             Command="{Binding $parent[UserControl].DataContext.InstallCatalogCommand}" CommandParameter="{Binding}" />
                                                     <Button Classes="ghost" Padding="8,6" ToolTip.Tip="{loc:Tr explore.viewOnGitHub}"
                                                             Command="{Binding $parent[UserControl].DataContext.OpenRepoCommand}" CommandParameter="{Binding Repo}">
@@ -81,11 +97,14 @@
                                                         <Border Classes="badge">
                                                             <TextBlock Text="{Binding LatestText}" />
                                                         </Border>
-                                                        <Border Classes="badge" Background="{StaticResource SuccessSoftBrush}" IsVisible="{Binding IsInstalled}">
-                                                            <TextBlock Text="{loc:Tr explore.installed}" Foreground="{StaticResource SuccessBrush}" />
+                                                        <Border Classes="badge" Background="{StaticResource SuccessSoftBrush}" IsVisible="{Binding IsInstalled}"
+                                                                ToolTip.Tip="{Binding ManualTip}">
+                                                            <TextBlock Text="{Binding InstalledText}" Foreground="{StaticResource SuccessBrush}" />
                                                         </Border>
                                                     </StackPanel>
                                                     <TextBlock Text="{Binding Description}" Classes="muted" Margin="0,6,0,0" />
+                                                    <TextBlock Text="{Binding ReleaseInfo}" Classes="muted" FontSize="11" Margin="0,6,0,0"
+                                                               IsVisible="{Binding ReleaseInfo, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                                                 </StackPanel>
                                             </DockPanel>
                                         </Border>

@@ -123,19 +123,59 @@ public sealed class CatalogItemViewModel(CatalogEntry entry) : ObservableObject
 
     public string LatestText => Release?.Tag ?? (Loading ? Loc.T("cat.loading") : Failed ? "—" : Loc.T("cat.noReleases"));
     public bool IsInstalled => Installed is not null;
-    public bool CanUpdate => Installed?.Source is { } s && Release is not null && !string.Equals(s.Tag, Release.Tag, StringComparison.OrdinalIgnoreCase);
+    /// <summary>Instalado a mano (arrastrando o desde archivo): no se sigue su repo hasta que se instale desde aquí.</summary>
+    public bool IsManual => Installed is { Source: null };
 
-    public string ActionText => Loc.T(Installed is null ? "common.install" : CanUpdate ? "common.update" : Installed.Source is null ? "cat.installGitHub" : "common.reinstall");
+    // Un mod instalado a mano no tiene tag guardado: se compara la versión del DLL con la del tag, si ambas son números de versión.
+    public bool CanUpdate => Installed is { } mod && Release is not null && (mod.Source is { } s
+        ? !string.Equals(s.Tag, Release.Tag, StringComparison.OrdinalIgnoreCase)
+        : IsNewer(Release.Tag, mod.Entry.Plugins.FirstOrDefault()?.Version));
+
+    public string ActionText => Loc.T(Installed is null ? "common.install" : CanUpdate ? "common.update" : "common.reinstall");
+    public string InstalledText => Loc.T(IsManual ? "explore.installedManual" : "explore.installed");
+    public string? ManualTip => IsManual ? Loc.T("explore.manual.tip") : null;
 
     public bool IsPrimaryAction => !IsInstalled || CanUpdate;
+
+    /// <summary>"Publicada el 12/10/2026 · 16 descargas" de la última release; las descargas solo cuentan esa versión.</summary>
+    public string? ReleaseInfo
+    {
+        get
+        {
+            if (Release is null) return null;
+            var downloads = Release.Assets.Sum(a => a.Downloads);
+            var parts = new[]
+            {
+                Release.PublishedAt == DateTime.MinValue ? null : Loc.T("cat.published", Release.PublishedAt.ToLocalTime().ToString("d", Loc.Instance.Culture)),
+                downloads == 0 ? null : Loc.T("cat.downloads", downloads.ToString("N0", Loc.Instance.Culture)),
+            };
+            return string.Join("  ·  ", parts.Where(p => p is not null));
+        }
+    }
+
+    public bool Matches(string filter) =>
+        string.IsNullOrWhiteSpace(filter)
+        || Title.Contains(filter, StringComparison.OrdinalIgnoreCase)
+        || Description.Contains(filter, StringComparison.OrdinalIgnoreCase)
+        || Entry.Author.Contains(filter, StringComparison.OrdinalIgnoreCase)
+        || Repo.Contains(filter, StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsNewer(string tag, string? installed) =>
+        System.Version.TryParse(tag.TrimStart('v', 'V'), out var latest)
+        && System.Version.TryParse(installed, out var current)
+        && latest > current;
 
     private void Refresh()
     {
         OnPropertyChanged(nameof(IsPrimaryAction));
         OnPropertyChanged(nameof(LatestText));
         OnPropertyChanged(nameof(IsInstalled));
+        OnPropertyChanged(nameof(IsManual));
         OnPropertyChanged(nameof(CanUpdate));
         OnPropertyChanged(nameof(ActionText));
+        OnPropertyChanged(nameof(InstalledText));
+        OnPropertyChanged(nameof(ManualTip));
+        OnPropertyChanged(nameof(ReleaseInfo));
     }
 }
 

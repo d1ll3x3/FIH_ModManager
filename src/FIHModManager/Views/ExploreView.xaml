@@ -36,7 +36,16 @@
                 </DockPanel>
             </Border>
 
-            <TextBlock Text="{loc:Tr explore.section}" Style="{StaticResource H2}" Margin="2,26,0,12" />
+            <DockPanel Margin="2,26,0,12">
+                <Grid DockPanel.Dock="Right" Width="280">
+                    <TextBox Text="{Binding CatalogFilter, UpdateSourceTrigger=PropertyChanged}" Tag="{loc:Tr explore.search}" Padding="36,9,10,9" />
+                    <TextBlock Style="{StaticResource Icon}" Text="&#xE721;" FontSize="13" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Left" Margin="13,0,0,0" />
+                </Grid>
+                <TextBlock Text="{loc:Tr explore.section}" Style="{StaticResource H2}" VerticalAlignment="Center" />
+            </DockPanel>
+
+            <TextBlock Text="{loc:Tr explore.noMatches}" Style="{StaticResource Muted}" HorizontalAlignment="Center" Margin="0,24,0,0"
+                       Visibility="{Binding NoCatalogMatches, Converter={StaticResource BoolToVis}}" />
 
             <ItemsControl ItemsSource="{Binding CatalogGroups}">
                 <ItemsControl.ItemTemplate>
@@ -57,20 +66,16 @@
                                         <Border x:Name="Card" Style="{StaticResource Card}" Margin="0,0,12,12" Padding="18">
                                             <DockPanel>
                                                 <DockPanel DockPanel.Dock="Bottom" Margin="0,16,0,0">
-                                                    <Button DockPanel.Dock="Right" Content="{Binding ActionText}"
+                                                    <!-- Instalar y Actualizar destacan; Reinstalar queda discreto -->
+                                                    <Button DockPanel.Dock="Right" Content="{Binding ActionText}" ToolTip="{Binding ManualTip}"
                                                             Command="{Binding DataContext.InstallCatalogCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
                                                         <Button.Style>
-                                                            <Style TargetType="Button" BasedOn="{StaticResource BaseButton}">
+                                                            <Style TargetType="Button" BasedOn="{StaticResource GhostButton}">
+                                                                <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
                                                                 <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding IsInstalled}" Value="False">
+                                                                    <DataTrigger Binding="{Binding IsPrimaryAction}" Value="True">
                                                                         <Setter Property="Background" Value="{StaticResource AccentGradient}" />
-                                                                    <Setter Property="BorderThickness" Value="0" />
-                                                                    <Setter Property="Foreground" Value="White" />
-                                                                    </DataTrigger>
-                                                                    <DataTrigger Binding="{Binding CanUpdate}" Value="True">
-                                                                        <Setter Property="Background" Value="{StaticResource AccentGradient}" />
-                                                                    <Setter Property="BorderThickness" Value="0" />
-                                                                    <Setter Property="Foreground" Value="White" />
+                                                                        <Setter Property="Foreground" Value="White" />
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
@@ -93,12 +98,14 @@
                                                         <Border Style="{StaticResource Badge}">
                                                             <TextBlock Text="{Binding LatestText}" />
                                                         </Border>
-                                                        <Border Style="{StaticResource Badge}" Background="{StaticResource SuccessSoftBrush}"
+                                                        <Border Style="{StaticResource Badge}" Background="{StaticResource SuccessSoftBrush}" ToolTip="{Binding ManualTip}"
                                                                 Visibility="{Binding IsInstalled, Converter={StaticResource BoolToVis}}">
-                                                            <TextBlock Text="{loc:Tr explore.installed}" Foreground="{StaticResource SuccessBrush}" />
+                                                            <TextBlock Text="{Binding InstalledText}" Foreground="{StaticResource SuccessBrush}" />
                                                         </Border>
                                                     </StackPanel>
                                                     <TextBlock Text="{Binding Description}" Style="{StaticResource Muted}" Margin="0,6,0,0" />
+                                                    <TextBlock Text="{Binding ReleaseInfo}" Style="{StaticResource Muted}" FontSize="11" Margin="0,6,0,0"
+                                                               Visibility="{Binding ReleaseInfo, Converter={StaticResource BoolToVis}}" />
                                                 </StackPanel>
                                             </DockPanel>
                                         </Border>

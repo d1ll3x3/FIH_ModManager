@@ -150,7 +150,8 @@ public static partial class GitHubService
     private static GitHubRelease ParseRelease(string repo, JsonElement e)
     {
         var assets = e.GetProperty("assets").EnumerateArray()
-            .Select(a => new GitHubAsset(a.GetProperty("name").GetString()!, a.GetProperty("browser_download_url").GetString()!, a.GetProperty("size").GetInt64()))
+            .Select(a => new GitHubAsset(a.GetProperty("name").GetString()!, a.GetProperty("browser_download_url").GetString()!, a.GetProperty("size").GetInt64(),
+                a.TryGetProperty("download_count", out var d) ? d.GetInt64() : 0))
             .ToList();
         return new GitHubRelease(
             repo,

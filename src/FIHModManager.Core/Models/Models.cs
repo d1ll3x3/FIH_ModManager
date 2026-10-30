@@ -69,7 +69,7 @@ public sealed class AppSettings
     public string? Language { get; set; }
 }
 
-public sealed record GitHubAsset(string Name, string DownloadUrl, long Size);
+public sealed record GitHubAsset(string Name, string DownloadUrl, long Size, long Downloads);
 
 public sealed record GitHubRelease(string Repo, string Tag, string Name, string Body, DateTime PublishedAt, string HtmlUrl, IReadOnlyList<GitHubAsset> Assets);
 

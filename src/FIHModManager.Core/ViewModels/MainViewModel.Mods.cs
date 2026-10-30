@@ -8,13 +8,18 @@ namespace FIHModManager.ViewModels;
 public sealed partial class MainViewModel
 {
     private string _modFilter = "";
+    private string _modStatus = "All";
 
     public ObservableCollection<ModItemViewModel> Mods { get; } = [];
-    /// <summary>Mods visibles con el filtro de búsqueda aplicado, ordenados por nombre.</summary>
+    /// <summary>Mods visibles con la búsqueda y el filtro de estado aplicados: primero los que tienen actualización, luego los activados.</summary>
     public ObservableCollection<ModItemViewModel> FilteredMods { get; } = [];
 
     public int EnabledModCount => Mods.Count(m => m.IsEnabled);
+    public int DisabledModCount => Mods.Count - EnabledModCount;
     public int UpdateCount => Mods.Count(m => m.UpdateAvailable);
+    public IReadOnlyList<ModItemViewModel> ModsWithUpdates => Mods.Where(m => m.UpdateAvailable).OrderBy(m => m.Title, StringComparer.CurrentCultureIgnoreCase).ToList();
+    /// <summary>Hay mods pero la búsqueda o el filtro de estado los ocultan todos.</summary>
+    public bool NoModMatches => Mods.Count > 0 && FilteredMods.Count == 0;
     public string ModsActiveText => Loc.T("mods.activeOfTotal", EnabledModCount, Mods.Count);
     public string ModsInstalledText => Loc.T("mods.installedSummary", EnabledModCount, Mods.Count);
     public string UpdatesText => Loc.T("home.updates", UpdateCount);
@@ -25,6 +30,16 @@ public sealed partial class MainViewModel
         set
         {
             if (Set(ref _modFilter, value)) RefreshFilteredMods();
+        }
+    }
+
+    /// <summary>"All", "Enabled", "Disabled" o "Updates" (los botones de filtro de "Mis mods").</summary>
+    public string ModStatus
+    {
+        get => _modStatus;
+        set
+        {
+            if (Set(ref _modStatus, value)) RefreshFilteredMods();
         }
     }
 
@@ -55,7 +70,7 @@ public sealed partial class MainViewModel
         });
     }
 
-    private async Task ReloadModsAsync()
+    private async Task ReloadModsAsync(bool keepOrder = false)
     {
         var game = SelectedGame;
         if (game is null) return;
@@ -87,22 +102,42 @@ public sealed partial class MainViewModel
             JsonStore.SaveState(game, _state);
         }
 
-        RefreshFilteredMods();
+        RefreshFilteredMods(keepOrder);
         RaiseModCounts();
         SyncCatalogInstalled();
     }
 
-    private void RefreshFilteredMods()
+    private void RefreshFilteredMods(bool keepOrder = false)
     {
+        // Al cambiar un switch se conserva el orden anterior para que la tarjeta no salte de sitio bajo el ratón.
+        var previous = keepOrder
+            ? FilteredMods.Select((m, i) => (m.Entry.Key, i)).ToDictionary(x => x.Key, x => x.i, StringComparer.OrdinalIgnoreCase)
+            : null;
+        var visible = Mods.Where(m => m.Matches(ModFilter) && MatchesStatus(m));
+        var ordered = previous is not null
+            ? visible.OrderBy(m => previous.GetValueOrDefault(m.Entry.Key, int.MaxValue))
+            : visible.OrderByDescending(m => m.UpdateAvailable).ThenByDescending(m => m.IsEnabled);
+
+        var list = ordered.ThenBy(m => m.Title, StringComparer.CurrentCultureIgnoreCase).ToList();
         FilteredMods.Clear();
-        foreach (var m in Mods.Where(m => m.Matches(ModFilter)).OrderBy(m => m.Title, StringComparer.CurrentCultureIgnoreCase))
-            FilteredMods.Add(m);
+        foreach (var m in list) FilteredMods.Add(m);
+        OnPropertyChanged(nameof(NoModMatches));
     }
+
+    private bool MatchesStatus(ModItemViewModel m) => ModStatus switch
+    {
+        "Enabled" => m.IsEnabled,
+        "Disabled" => !m.IsEnabled,
+        "Updates" => m.UpdateAvailable,
+        _ => true,
+    };
 
     private void RaiseModCounts()
     {
         OnPropertyChanged(nameof(EnabledModCount));
+        OnPropertyChanged(nameof(DisabledModCount));
         OnPropertyChanged(nameof(UpdateCount));
+        OnPropertyChanged(nameof(ModsWithUpdates));
         OnPropertyChanged(nameof(ModsActiveText));
         OnPropertyChanged(nameof(ModsInstalledText));
         OnPropertyChanged(nameof(UpdatesText));
@@ -128,7 +163,7 @@ public sealed partial class MainViewModel
             mod.SetEnabledState(!enabled);
             ShowToast(FriendlyError(ex), ToastKind.Error);
         }
-        await ReloadModsAsync();
+        await ReloadModsAsync(keepOrder: true);
     }
 
     private async Task AddModFromFileAsync()
@@ -213,6 +248,7 @@ public sealed partial class MainViewModel
                 mod.LatestTag = release?.Tag;
             }
             RaiseModCounts();
+            RefreshFilteredMods();
             if (!silent)
                 ShowToast(UpdateCount == 0 ? Loc.T("toast.upToDate") : Loc.T("toast.updatesAvailable", UpdateCount), UpdateCount == 0 ? ToastKind.Success : ToastKind.Info);
         }

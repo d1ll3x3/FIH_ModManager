@@ -24,12 +24,34 @@
             </StackPanel>
         </DockPanel>
 
-        <Grid DockPanel.Dock="Top" Margin="0,20,0,14">
+        <Grid DockPanel.Dock="Top" Margin="0,20,0,12">
             <TextBox Text="{Binding ModFilter, UpdateSourceTrigger=PropertyChanged}" Tag="{loc:Tr mods.search}" Padding="36,9,10,9" />
             <TextBlock Style="{StaticResource Icon}" Text="&#xE721;" FontSize="13" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Left" Margin="13,0,0,0" />
         </Grid>
 
+        <!-- Filtros por estado -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,14">
+            <RadioButton Style="{StaticResource FilterChip}" GroupName="ModStatus"
+                         IsChecked="{Binding ModStatus, Converter={StaticResource Equals}, ConverterParameter=All}">
+                <TextBlock><Run Text="{loc:Tr mods.filter.all}" /><Run Text="  " /><Run Text="{Binding Mods.Count, Mode=OneWay}" Foreground="{StaticResource MutedBrush}" /></TextBlock>
+            </RadioButton>
+            <RadioButton Style="{StaticResource FilterChip}" GroupName="ModStatus"
+                         IsChecked="{Binding ModStatus, Converter={StaticResource Equals}, ConverterParameter=Enabled}">
+                <TextBlock><Run Text="{loc:Tr mods.filter.enabled}" /><Run Text="  " /><Run Text="{Binding EnabledModCount, Mode=OneWay}" Foreground="{StaticResource MutedBrush}" /></TextBlock>
+            </RadioButton>
+            <RadioButton Style="{StaticResource FilterChip}" GroupName="ModStatus"
+                         IsChecked="{Binding ModStatus, Converter={StaticResource Equals}, ConverterParameter=Disabled}">
+                <TextBlock><Run Text="{loc:Tr mods.filter.disabled}" /><Run Text="  " /><Run Text="{Binding DisabledModCount, Mode=OneWay}" Foreground="{StaticResource MutedBrush}" /></TextBlock>
+            </RadioButton>
+            <RadioButton Style="{StaticResource FilterChip}" GroupName="ModStatus"
+                         IsChecked="{Binding ModStatus, Converter={StaticResource Equals}, ConverterParameter=Updates}">
+                <TextBlock><Run Text="{loc:Tr mods.filter.updates}" /><Run Text="  " /><Run Text="{Binding UpdateCount, Mode=OneWay}" Foreground="{StaticResource MutedBrush}" /></TextBlock>
+            </RadioButton>
+        </StackPanel>
+
         <Grid>
+            <TextBlock Text="{loc:Tr mods.noMatches}" Style="{StaticResource Muted}" HorizontalAlignment="Center" Margin="0,24,0,0"
+                       Visibility="{Binding NoModMatches, Converter={StaticResource BoolToVis}}" />
             <!-- Vacío -->
             <Border Style="{StaticResource Card}" VerticalAlignment="Top" Padding="36" BorderBrush="#3D3D52"
                     Visibility="{Binding Mods.Count, Converter={StaticResource InvBoolToVis}}">

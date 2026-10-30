@@ -62,6 +62,11 @@ public sealed partial class MainViewModel
         var modsByGuid = Mods.SelectMany(m => m.Entry.Plugins.Select(p => (p.Guid, m.Title)))
             .GroupBy(x => x.Guid, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(g => g.Key, g => g.First().Title, StringComparer.OrdinalIgnoreCase);
+        // Archivos extra de un mod ("com.x.trainerghost.json", "TextChat.BadWords.txt") empiezan por su GUID o por el nombre de su DLL.
+        var prefixes = Mods.SelectMany(m => m.Entry.Guids.Concat(m.Entry.Dlls.Select(Path.GetFileNameWithoutExtension)).Select(p => (Prefix: p!, m.Title)))
+            .Where(x => x.Prefix.Length >= 4)
+            .OrderByDescending(x => x.Prefix.Length)
+            .ToList();
 
         var files = Directory.EnumerateFiles(game.ConfigDir)
             .Where(f => f.EndsWith(".cfg", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".json", StringComparison.OrdinalIgnoreCase)
@@ -71,7 +76,9 @@ public sealed partial class MainViewModel
         {
             var stem = Path.GetFileNameWithoutExtension(file);
             var isCore = stem.Equals("BepInEx", StringComparison.OrdinalIgnoreCase);
-            var title = isCore ? "BepInEx" : modsByGuid.GetValueOrDefault(stem);
+            var title = isCore ? "BepInEx"
+                : modsByGuid.GetValueOrDefault(stem)
+                  ?? prefixes.FirstOrDefault(x => stem.StartsWith(x.Prefix, StringComparison.OrdinalIgnoreCase)).Title;
             ConfigFiles.Add(new ConfigFileViewModel(file, title ?? stem, title is null ? null : stem));
         }
 

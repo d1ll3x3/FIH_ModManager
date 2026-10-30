@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:loc="using:FIHModManager.Infrastructure"
+             xmlns:vm="using:FIHModManager.ViewModels"
              x:Class="FIHModManager.Views.HomeView">
     <ScrollViewer>
         <StackPanel Margin="32,4,32,32" Spacing="16">
@@ -109,6 +110,29 @@
                         </DockPanel>
                     </Border>
                 </Grid>
+
+                <!-- Actualizaciones disponibles -->
+                <Border Classes="card" IsVisible="{Binding UpdateCount, Converter={StaticResource HasItems}}">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Tr home.updatesTitle}" Classes="h2" Margin="0,0,0,8" />
+                        <ItemsControl ItemsSource="{Binding ModsWithUpdates}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="vm:ModItemViewModel">
+                                    <DockPanel Margin="0,8,0,0">
+                                        <Button DockPanel.Dock="Right" Classes="primary" Padding="12,6" Content="{Binding UpdateText}"
+                                                Command="{Binding $parent[UserControl].DataContext.UpdateModCommand}" CommandParameter="{Binding}" />
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold" Margin="0,0,10,0" />
+                                            <Border Classes="badge" IsVisible="{Binding Version, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                                <TextBlock Text="{Binding Version}" />
+                                            </Border>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
 
                 <!-- Proton (solo Linux): opción de lanzamiento de Steam -->
                 <Border Classes="card" Padding="20,16" IsVisible="{Binding ShowProton}">

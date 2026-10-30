@@ -34,13 +34,46 @@
             </StackPanel>
         </DockPanel>
 
-        <TextBox DockPanel.Dock="Top" Margin="0,20,0,14" Text="{Binding ModFilter}" Watermark="{loc:Tr mods.search}">
+        <TextBox DockPanel.Dock="Top" Margin="0,20,0,12" Text="{Binding ModFilter}" Watermark="{loc:Tr mods.search}">
             <TextBox.InnerLeftContent>
                 <TextBlock Classes="icon" Text="{x:Static loc:Icons.Search}" FontSize="16" Foreground="{StaticResource MutedBrush}" Margin="10,0,0,0" />
             </TextBox.InnerLeftContent>
         </TextBox>
 
+        <!-- Filtros por estado -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,14" Spacing="8">
+            <RadioButton Classes="chip" GroupName="modStatus"
+                         IsChecked="{Binding ModStatus, Converter={StaticResource Equals}, ConverterParameter=All}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{loc:Tr mods.filter.all}" />
+                    <TextBlock Text="{Binding Mods.Count}" Foreground="{StaticResource MutedBrush}" />
+                </StackPanel>
+            </RadioButton>
+            <RadioButton Classes="chip" GroupName="modStatus"
+                         IsChecked="{Binding ModStatus, Converter={StaticResource Equals}, ConverterParameter=Enabled}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{loc:Tr mods.filter.enabled}" />
+                    <TextBlock Text="{Binding EnabledModCount}" Foreground="{StaticResource MutedBrush}" />
+                </StackPanel>
+            </RadioButton>
+            <RadioButton Classes="chip" GroupName="modStatus"
+                         IsChecked="{Binding ModStatus, Converter={StaticResource Equals}, ConverterParameter=Disabled}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{loc:Tr mods.filter.disabled}" />
+                    <TextBlock Text="{Binding DisabledModCount}" Foreground="{StaticResource MutedBrush}" />
+                </StackPanel>
+            </RadioButton>
+            <RadioButton Classes="chip" GroupName="modStatus"
+                         IsChecked="{Binding ModStatus, Converter={StaticResource Equals}, ConverterParameter=Updates}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{loc:Tr mods.filter.updates}" />
+                    <TextBlock Text="{Binding UpdateCount}" Foreground="{StaticResource MutedBrush}" />
+                </StackPanel>
+            </RadioButton>
+        </StackPanel>
+
         <Panel>
+            <TextBlock Text="{loc:Tr mods.noMatches}" Classes="muted" HorizontalAlignment="Center" Margin="0,24,0,0" IsVisible="{Binding NoModMatches}" />
             <Border Classes="card" VerticalAlignment="Top" Padding="36" IsVisible="{Binding Mods.Count, Converter={StaticResource NoItems}}">
                 <StackPanel HorizontalAlignment="Center" Spacing="6">
                     <TextBlock Classes="icon" Text="{x:Static loc:Icons.Download}" FontSize="44" Foreground="{StaticResource MutedBrush}" />

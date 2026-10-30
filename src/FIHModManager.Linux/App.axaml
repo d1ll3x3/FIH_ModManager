@@ -220,6 +220,35 @@
             <Setter Property="FontWeight" Value="SemiBold" />
         </Style>
 
+        <!-- ===== Filtro tipo pastilla ===== -->
+        <Style Selector="RadioButton.chip">
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Name="bd" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1"
+                            CornerRadius="15" Padding="14,6">
+                        <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="RadioButton.chip:pointerover /template/ Border#bd">
+            <Setter Property="Background" Value="{StaticResource Surface2Brush}" />
+        </Style>
+        <Style Selector="RadioButton.chip:pointerover">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        </Style>
+        <Style Selector="RadioButton.chip:checked /template/ Border#bd">
+            <Setter Property="Background" Value="{StaticResource AccentSoftBrush}" />
+            <Setter Property="BorderBrush" Value="#66E0344B" />
+        </Style>
+        <Style Selector="RadioButton.chip:checked">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        </Style>
+
         <!-- ===== Entradas ===== -->
         <Style Selector="TextBox">
             <Setter Property="CornerRadius" Value="10" />
