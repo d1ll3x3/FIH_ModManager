@@ -1,4 +1,4 @@
-# Al subir un tag vX.Y.Z compila las dos versiones, firma el exe de Windows con SignPath
+# Al subir un tag vX.Y.Z compila las dos versiones, firma el exe de Windows con SignPath (si está configurado)
 # y deja una release en borrador con los dos ejecutables, lista para escribir las notas y publicar.
 name: Release
 
@@ -39,7 +39,9 @@ jobs:
           path: publish/windows/FIHModManager.exe
           if-no-files-found: error
 
-      - uses: signpath/github-action-submit-signing-request@v3
+      # Mientras SignPath no apruebe el proyecto no existe la variable de la organización: se publica sin firmar.
+      - if: vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@v3
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
@@ -54,7 +56,7 @@ jobs:
       - uses: actions/upload-artifact@v5
         with:
           name: windows
-          path: signed/FIHModManager.exe
+          path: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' && 'signed' || 'publish/windows' }}/FIHModManager.exe
           if-no-files-found: error
 
   linux:
