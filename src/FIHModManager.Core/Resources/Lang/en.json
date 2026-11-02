@@ -96,6 +96,8 @@
   "cat.desc.FIH-Photo-Mode": "Hide the HUD, freeze time, free camera and FOV control; saves screenshots as PNG.",
   "cat.desc.FIH-Text-Chat": "Multiplayer text chat with commands, mentions, autocomplete and a profanity filter.",
   "cat.desc.StickerSwap": "Put your own picture on the back of your phone as a sticker (K to edit).",
+  "cat.desc.TripodCam": "Put a camera on a tripod anywhere and record MP4 clips with the game's sound while you play (T to place, Y to record).",
+  "cat.desc.FIH_NoRestartNovember": "Once you start a run you have to finish it: no restarting, no main menu, and the game resumes it on launch.",
   "cat.desc.FirstPersonIsHard": "First person camera that keeps the horizon level while the phone flips.",
   "config.subtitle": "Tweak BepInEx and your mods without editing .cfg files by hand.",
   "config.openFolder.tip": "Open config folder",

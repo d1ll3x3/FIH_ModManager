@@ -29,10 +29,12 @@ public static partial class GitHubService
         new("d1ll3x3/ChaosIsHard", "Chaos is Hard", "bolt", "Topper"),
         new("d1ll3x3/ChainedIsHard", "Chained is Hard", "link", "Topper"),
         new("d1ll3x3/FirstPersonIsHard", "First Person", "visibility", "Topper"),
+        new("d1ll3x3/FIH_NoRestartNovember", "No Restart November", "lock", "Topper"),
         new("GamingGamer115/FIH-Korean-Translator", "Korean Translator", "translate", "Gaming_Gamer"),
         new("GamingGamer115/FIH-Photo-Mode", "Photo Mode", "camera", "Gaming_Gamer"),
         new("GamingGamer115/FIH-Text-Chat", "Text Chat", "chat", "Gaming_Gamer"),
         new("fabuleo8796/StickerSwap", "StickerSwap", "image", "Fabuleo8796"),
+        new("fabuleo8796/TripodCam", "Tripod Cam", "videocam", "Fabuleo8796"),
     ];
 
     private static HttpClient CreateClient()

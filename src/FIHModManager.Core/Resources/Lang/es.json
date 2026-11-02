@@ -96,6 +96,8 @@
   "cat.desc.FIH-Photo-Mode": "Oculta el HUD, congela el tiempo, cámara libre y control del FOV; guarda capturas en PNG.",
   "cat.desc.FIH-Text-Chat": "Chat de texto multijugador con comandos, menciones, autocompletado y filtro de palabrotas.",
   "cat.desc.StickerSwap": "Pon tu propia imagen como pegatina en la parte trasera del móvil (K para editar).",
+  "cat.desc.TripodCam": "Pon una cámara en un trípode en cualquier sitio y graba clips MP4 con el sonido del juego mientras juegas (T para colocarla, Y para grabar).",
+  "cat.desc.FIH_NoRestartNovember": "Si empiezas una run, tienes que acabarla: sin reiniciar, sin menú principal y el juego la retoma al abrirlo.",
   "cat.desc.FirstPersonIsHard": "Cámara en primera persona que mantiene el horizonte mientras el móvil gira.",
   "config.subtitle": "Ajusta BepInEx y tus mods sin abrir los archivos .cfg a mano.",
   "config.openFolder.tip": "Abrir carpeta config",

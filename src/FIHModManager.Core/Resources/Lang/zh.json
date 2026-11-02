@@ -96,6 +96,8 @@
   "cat.desc.FIH-Photo-Mode": "隐藏 HUD、冻结时间、自由视角和视野调节；截图保存为 PNG。",
   "cat.desc.FIH-Text-Chat": "多人文字聊天，支持命令、提及、自动补全和脏话过滤。",
   "cat.desc.StickerSwap": "把你自己的图片作为贴纸贴在手机背面（按 K 编辑）。",
+  "cat.desc.TripodCam": "在任意位置架起三脚架摄像机，边玩边录制带游戏声音的 MP4 片段（T 放置，Y 录制）。",
+  "cat.desc.FIH_NoRestartNovember": "一旦开始一局就必须打完：不能重开、不能回主菜单，重新打开游戏会直接继续这一局。",
   "cat.desc.FirstPersonIsHard": "第一人称视角，手机翻转时保持地平线水平。",
   "config.subtitle": "无需手动编辑 .cfg 文件即可调整 BepInEx 和模组。",
   "config.openFolder.tip": "打开 config 文件夹",
