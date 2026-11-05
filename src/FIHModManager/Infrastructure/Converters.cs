@@ -60,6 +60,9 @@ public sealed class IconGlyphConverter : IValueConverter
         ["image"] = "\uE91B",
         ["lock"] = "\uE72E",
         ["videocam"] = "\uE714",
+        ["brush"] = "\uE771",
+        ["sparkle"] = "\uF4A5",
+        ["brightness"] = "\uE706",
     };
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>

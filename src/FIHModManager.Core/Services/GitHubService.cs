@@ -35,6 +35,9 @@ public static partial class GitHubService
         new("GamingGamer115/FIH-Text-Chat", "Text Chat", "chat", "Gaming_Gamer"),
         new("fabuleo8796/StickerSwap", "StickerSwap", "image", "Fabuleo8796"),
         new("fabuleo8796/TripodCam", "Tripod Cam", "videocam", "Fabuleo8796"),
+        new("fabuleo8796/CapeEditor", "Cape Editor", "brush", "Fabuleo8796"),
+        new("fabuleo8796/FlippyAuras", "Flippy Auras", "sparkle", "Fabuleo8796"),
+        new("fabuleo8796/FIHUltra", "FIH Ultra", "brightness", "Fabuleo8796"),
     ];
 
     private static HttpClient CreateClient()
