@@ -144,6 +144,7 @@ public sealed partial class MainViewModel
             item.Installed = Mods.FirstOrDefault(m => string.Equals(m.Source?.Repo, item.Repo, StringComparison.OrdinalIgnoreCase))
                              ?? Mods.FirstOrDefault(m => m.Source is null && m.Entry.Dlls.Concat(m.Entry.RenamedDlls).Any(d => assetStems.Contains(Path.GetFileNameWithoutExtension(d))));
         }
+        RaiseRunBlocking();
     }
 
     // "FIHMapEditor_v0.15.1.zip" -> "FIHMapEditor", "CharmReplacer-v1.6.0.zip" -> "CharmReplacer"
