@@ -59,20 +59,50 @@ public sealed partial class MainViewModel
 
     private void InitExplore()
     {
-        foreach (var entry in GitHubService.Catalog.Concat(GitHubService.SpeedrunOnly)) Catalog.Add(new CatalogItemViewModel(entry));
-        RefreshCatalogGroups();
         InitSpeedrun();
+        ApplyCatalog(CatalogService.LoadLocal());
 
         InstallCatalogCommand = new AsyncCommand(p => InstallFromRepoAsync(((CatalogItemViewModel)p!).Repo, forceRefresh: false), _ => HasGame && !IsBusy);
         InstallRepoInputCommand = new AsyncCommand(InstallFromInputAsync, () => HasGame && !IsBusy && !string.IsNullOrWhiteSpace(RepoInput));
-        RefreshCatalogCommand = new AsyncCommand(() => LoadCatalogAsync(force: true));
+        RefreshCatalogCommand = new AsyncCommand(async () =>
+        {
+            await UpdateCatalogAsync();
+            await LoadCatalogAsync(force: true);
+        });
         OpenRepoCommand = new RelayCommand(p => GameLauncher.OpenUrl($"https://github.com/{p}"));
     }
 
+    /// <summary>Rehace las tarjetas de "Explorar" y Speedrun con otra lista de mods (la guardada o la recién descargada).</summary>
+    private void ApplyCatalog(IReadOnlyList<CatalogEntry> entries)
+    {
+        Catalog.Clear();
+        foreach (var entry in entries) Catalog.Add(new CatalogItemViewModel(entry));
+        _catalogLoaded = false;
+        RefreshCatalogGroups();
+        RefreshSpeedrun();
+        SyncCatalogInstalled();
+    }
+
+    /// <summary>Descarga el catálogo del repo; si ha cambiado, lo aplica.</summary>
+    private async Task<bool> UpdateCatalogAsync()
+    {
+        if (await CatalogService.FetchAsync() is not { } entries) return false;
+        ApplyCatalog(entries);
+        return true;
+    }
+
+    // Al arrancar se enseña el catálogo guardado y el nuevo se pide en segundo plano: sin conexión no debe frenar nada.
+    private async Task UpdateCatalogOnStartupAsync()
+    {
+        if (await UpdateCatalogAsync() && CurrentPage is "Explore" or "Speedrun")
+            await LoadCatalogAsync(force: false);
+    }
+
     private void RefreshCatalogGroups() =>
-        CatalogGroups = Catalog.Where(c => GitHubService.Catalog.Contains(c.Entry) && c.Matches(CatalogFilter)
+        CatalogGroups = Catalog.Where(c => c.Entry.Explore && c.Matches(CatalogFilter)
                                            && (CatalogCategory == "All" || c.Entry.Category == CatalogCategory))
             .GroupBy(c => c.Entry.Category)
+            .OrderBy(g => Array.IndexOf(CatalogService.Categories, g.Key))
             .Select(g => new CatalogGroup(g.Key, g.ToList()))
             .ToList();
 
@@ -82,7 +112,7 @@ public sealed partial class MainViewModel
         _catalogLoaded = true;
         CatalogError = null;
 
-        var tasks = Catalog.Select(async item =>
+        var tasks = Catalog.ToList().Select(async item =>
         {
             item.Loading = true;
             item.Failed = false;

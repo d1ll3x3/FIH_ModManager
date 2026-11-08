@@ -263,6 +263,7 @@ public sealed partial class MainViewModel : ObservableObject
             ShowToast(Loc.T("toast.noGame"), ToastKind.Info);
 
         _ = SelfUpdateService.CleanupAsync();
+        _ = UpdateCatalogOnStartupAsync();
         await CheckAppUpdateAsync(silent: true);
     }
 

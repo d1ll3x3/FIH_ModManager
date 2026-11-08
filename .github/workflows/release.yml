@@ -12,6 +12,7 @@ permissions:
 
 env:
   PUBLISH_ARGS: -c Release --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true
+  CATALOG_URL: https://raw.githubusercontent.com/d1ll3x3/FIH-ModCatalog/main/mods.json
 
 jobs:
   windows:
@@ -29,6 +30,11 @@ jobs:
         run: |
           $version = ([xml](Get-Content src/Directory.Build.props)).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
           if ("v$version" -ne $env:GITHUB_REF_NAME) { throw "Tag $env:GITHUB_REF_NAME does not match Version $version in src/Directory.Build.props" }
+
+      # El ejecutable lleva dentro el catálogo de mods más reciente, para el primer arranque o sin conexión.
+      - name: Update embedded catalog
+        shell: bash
+        run: curl -fsSL "$CATALOG_URL" -o src/FIHModManager.Core/Resources/catalog.json
 
       - run: dotnet publish src/FIHModManager -r win-x64 ${{ env.PUBLISH_ARGS }} -o publish/windows
 
@@ -66,6 +72,8 @@ jobs:
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
+      - name: Update embedded catalog
+        run: curl -fsSL "$CATALOG_URL" -o src/FIHModManager.Core/Resources/catalog.json
       - run: dotnet publish src/FIHModManager.Linux -r linux-x64 ${{ env.PUBLISH_ARGS }} -o publish/linux
       - uses: actions/upload-artifact@v5
         with:

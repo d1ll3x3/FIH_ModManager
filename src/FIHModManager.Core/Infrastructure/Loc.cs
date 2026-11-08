@@ -55,6 +55,10 @@ public sealed class Loc : INotifyPropertyChanged
     public static string T(string key, params object?[] args) =>
         args.Length == 0 ? Instance[key] : string.Format(Instance.Culture, Instance[key], args);
 
+    /// <summary>Texto traído de fuera con una versión por idioma (el catálogo): el del idioma actual o, si falta, el inglés.</summary>
+    public static string Pick(IReadOnlyDictionary<string, string> texts) =>
+        texts.GetValueOrDefault(Instance.Language.Code) ?? texts.GetValueOrDefault(DefaultCode) ?? "";
+
     public void SetLanguage(string? code)
     {
         var lang = Languages.FirstOrDefault(l => l.Code == code) ?? Languages[0];

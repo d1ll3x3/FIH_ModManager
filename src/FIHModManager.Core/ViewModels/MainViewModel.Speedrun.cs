@@ -31,12 +31,17 @@ public sealed partial class MainViewModel
 
     public RelayCommand OpenLeaderboardCommand { get; private set; } = null!;
 
-    // Usa las mismas tarjetas que "Explorar", así comparten la release consultada y el mod instalado.
-    private void InitSpeedrun()
-    {
-        _speedrunMods = GitHubService.Speedrun
-            .Select(s => new SpeedrunItemViewModel(Catalog.First(c => c.Repo == s.Repo), s.Allowed, s.NoteKey))
-            .ToList();
+    private void InitSpeedrun() =>
         OpenLeaderboardCommand = new RelayCommand(() => GameLauncher.OpenUrl(LeaderboardUrl));
+
+    // Usa las mismas tarjetas que "Explorar", así comparten la release consultada y el mod instalado.
+    private void RefreshSpeedrun()
+    {
+        _speedrunMods = Catalog.Where(c => c.Entry.Speedrun is not null)
+            .Select(c => new SpeedrunItemViewModel(c, c.Entry.Speedrun!))
+            .ToList();
+        OnPropertyChanged(nameof(SpeedrunAllowedCount));
+        OnPropertyChanged(nameof(SpeedrunBannedCount));
+        OnPropertyChanged(nameof(SpeedrunItems));
     }
 }

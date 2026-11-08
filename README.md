@@ -20,6 +20,8 @@ update and configure mods without touching the game files by hand. Runs on **Win
 - **Explore**: catalog of Flipping is Hard mods, grouped by category (cosmetics, graphics and camera,
   practice, challenges, multiplayer and language, creation) with a filter and search, installed straight
   from their GitHub releases, plus any other repo (`user/repo` or URL). Shows a badge when a new release is out.
+  The list comes from [FIH-ModCatalog](https://github.com/d1ll3x3/FIH-ModCatalog): to add your mod, open a pull
+  request there.
 - **Speedrun**: speedrun mods split into the ones allowed and not allowed in runs submitted to
   [speedrun.com](https://www.speedrun.com/Flipping_Is_Hard), with install buttons and switches. The window
   takes the colours of the game's speedrun.com page while this tab is open.
@@ -111,8 +113,9 @@ signed.
 ## Privacy policy
 
 This program does not collect or send any personal data. It only connects to GitHub
-(`api.github.com` and GitHub's download servers) to check for new releases of itself and of
-the mods listed in Explore, and to download the files you choose to install. These are plain
+(`api.github.com`, `raw.githubusercontent.com` and GitHub's download servers) to get the list of mods,
+check for new releases of itself and of the mods listed in Explore, and download the files you choose
+to install. These are plain
 requests without an account; GitHub sees the usual request data (IP address, app name and
 version). Settings and logs stay on your computer.
 

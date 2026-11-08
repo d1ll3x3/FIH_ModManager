@@ -11,6 +11,8 @@
     <!-- BepInEx 6.0.0-be.755 IL2CPP (el zip del escritorio): bajo Proton se usa el mismo build de Windows -->
     <EmbeddedResource Include="Resources\BepInEx.zip" LogicalName="BepInEx.zip" />
     <EmbeddedResource Include="Resources\Lang\*.json" LogicalName="Lang.%(Filename).json" />
+    <!-- Copia de mods.json del repo FIH-ModCatalog para el primer arranque o sin conexión; el workflow de release la renueva -->
+    <EmbeddedResource Include="Resources\catalog.json" LogicalName="catalog.json" />
   </ItemGroup>
 
   <ItemGroup>

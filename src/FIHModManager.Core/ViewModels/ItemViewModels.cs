@@ -76,10 +76,11 @@ public sealed record CatalogGroup(string Category, IReadOnlyList<CatalogItemView
 }
 
 /// <summary>Fila de la pestaña Speedrun: el mod del catálogo, si se permite en runs y su condición de uso, si la tiene.</summary>
-public sealed record SpeedrunItemViewModel(CatalogItemViewModel Item, bool Allowed, string? NoteKey)
+public sealed record SpeedrunItemViewModel(CatalogItemViewModel Item, SpeedrunRule Rule)
 {
-    public bool Banned => !Allowed;
-    public string? Note => NoteKey is null ? null : Loc.T(NoteKey);
+    public bool Allowed => Rule.Allowed;
+    public bool Banned => !Rule.Allowed;
+    public string? Note => Rule.Note is null ? null : Loc.Pick(Rule.Note);
 }
 
 public sealed class CatalogItemViewModel(CatalogEntry entry) : ObservableObject
@@ -91,7 +92,7 @@ public sealed class CatalogItemViewModel(CatalogEntry entry) : ObservableObject
 
     public CatalogEntry Entry { get; } = entry;
     public string Title => Entry.Title;
-    public string Description => Loc.T("cat.desc." + Entry.Repo.Split('/')[1]);
+    public string Description => Loc.Pick(Entry.Description);
     public string Icon => Entry.Icon;
     public string Repo => Entry.Repo;
     public string Author => Entry.Author;

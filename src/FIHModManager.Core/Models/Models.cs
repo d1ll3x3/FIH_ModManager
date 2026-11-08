@@ -73,10 +73,33 @@ public sealed record GitHubAsset(string Name, string DownloadUrl, long Size, lon
 
 public sealed record GitHubRelease(string Repo, string Tag, string Name, string Body, DateTime PublishedAt, string HtmlUrl, IReadOnlyList<GitHubAsset> Assets);
 
-/// <summary>Icon es un nombre neutro ("edit", "timer"…); cada interfaz lo traduce a su fuente de iconos.
-/// Category es la sección de "Explorar" ("cosmetic", "graphics"…), con su nombre en cat.group.&lt;Category&gt;.</summary>
-public sealed record CatalogEntry(string Repo, string Title, string Icon, string Author, string Category);
+/// <summary>mods.json del repo FIH-ModCatalog: la lista de mods de "Explorar" y de la pestaña Speedrun.</summary>
+public sealed class CatalogFile
+{
+    public int Version { get; init; }
+    public List<CatalogEntry> Mods { get; init; } = [];
+}
 
-/// <summary>Mod de la pestaña Speedrun: Allowed indica si se puede usar en una run grabada para speedrun.com.
-/// NoteKey es una clave de traducción opcional con una condición de uso (p. ej. "solo para runs TAS").</summary>
-public sealed record SpeedrunEntry(string Repo, bool Allowed, string? NoteKey = null);
+/// <summary>
+/// Un mod del catálogo. Icon es un nombre neutro ("edit", "timer"…) que cada interfaz traduce a su fuente de iconos;
+/// Category es la sección de "Explorar", con su nombre en cat.group.&lt;Category&gt;. Los textos van por idioma, con "en" siempre.
+/// </summary>
+public sealed class CatalogEntry
+{
+    public string Repo { get; init; } = "";
+    public string Title { get; init; } = "";
+    public string Author { get; init; } = "";
+    public string Category { get; init; } = "";
+    public string Icon { get; init; } = "";
+    /// <summary>false: solo aparece en la pestaña Speedrun.</summary>
+    public bool Explore { get; init; } = true;
+    public SpeedrunRule? Speedrun { get; init; }
+    public Dictionary<string, string> Description { get; init; } = [];
+}
+
+/// <summary>Si el mod se puede usar en una run grabada para speedrun.com, con una condición opcional (p. ej. "solo para runs TAS").</summary>
+public sealed class SpeedrunRule
+{
+    public bool Allowed { get; init; }
+    public Dictionary<string, string>? Note { get; init; }
+}
