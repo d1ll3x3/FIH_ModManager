@@ -41,10 +41,18 @@ public partial class MainWindow : Window
     }
 
     // Cada visita crea la página de nuevo para que se reproduzca la animación de entrada.
-    private void ShowPage(string page) => PageHost.Content = page switch
+    // El tema va antes que la página: sus StaticResource se resuelven al crearla y no deben coger los colores de Speedrun.
+    private void ShowPage(string page)
+    {
+        SpeedrunTheme.Apply(page == "Speedrun");
+        PageHost.Content = CreatePage(page);
+    }
+
+    private static UIElement CreatePage(string page) => page switch
     {
         "Mods" => new ModsView(),
         "Explore" => new ExploreView(),
+        "Speedrun" => new SpeedrunView(),
         "Config" => new ConfigView(),
         "Profiles" => new ProfilesView(),
         "Settings" => new SettingsView(),

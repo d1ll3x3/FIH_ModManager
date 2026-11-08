@@ -7,7 +7,7 @@
         xmlns:models="clr-namespace:FIHModManager.Models;assembly=FIHModManager.Core"
         Title="FIH Mod Manager" Width="1220" Height="780" MinWidth="980" MinHeight="640"
         WindowStartupLocation="CenterScreen" Icon="Resources/icon.ico"
-        Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}"
+        Background="{DynamicResource BgBrush}" Foreground="{DynamicResource TextBrush}"
         FontFamily="{StaticResource UiFont}" AllowDrop="True"
         UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
 
@@ -22,30 +22,38 @@
         </Grid.ColumnDefinitions>
 
         <!-- ================= Barra lateral ================= -->
-        <Border Grid.Column="0" Background="{StaticResource SidebarBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0">
+        <Border Grid.Column="0" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
             <DockPanel Margin="16,14,16,16">
                 <!-- Logo -->
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4,0,0,22">
-                    <Border Width="42" Height="42" CornerRadius="11" ClipToBounds="True">
-                        <Border.Background>
-                            <ImageBrush ImageSource="Resources/icon.png" Stretch="UniformToFill" />
-                        </Border.Background>
-                    </Border>
+                    <Grid Width="42" Height="42">
+                        <Border CornerRadius="11" Visibility="{Binding IsSpeedrunPage, Converter={StaticResource InvBoolToVis}}">
+                            <Border.Background>
+                                <ImageBrush ImageSource="Resources/icon.png" Stretch="UniformToFill" />
+                            </Border.Background>
+                        </Border>
+                        <!-- Portada vertical: se ve su parte de arriba, con el título del juego -->
+                        <Border CornerRadius="11" Visibility="{Binding IsSpeedrunPage, Converter={StaticResource BoolToVis}}">
+                            <Border.Background>
+                                <ImageBrush ImageSource="Resources/speedrun_cover.png" Stretch="UniformToFill" AlignmentY="Top" />
+                            </Border.Background>
+                        </Border>
+                    </Grid>
                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="FIH Mod Manager" FontSize="16" FontWeight="Bold" />
-                        <TextBlock Text="Flipping is Hard" FontSize="12" Foreground="{StaticResource MutedBrush}" />
+                        <TextBlock Text="Flipping is Hard" FontSize="12" Foreground="{DynamicResource MutedBrush}" />
                     </StackPanel>
                 </StackPanel>
 
                 <!-- Selector de instalación -->
                 <StackPanel DockPanel.Dock="Top" Margin="0,0,0,18">
-                    <TextBlock Text="{loc:Tr side.installation}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource MutedBrush}" Margin="4,0,0,6" />
+                    <TextBlock Text="{loc:Tr side.installation}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource MutedBrush}" Margin="4,0,0,6" />
                     <ComboBox ItemsSource="{Binding Games}" SelectedItem="{Binding SelectedGame}" MinHeight="54">
                         <ComboBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type models:GameInstall}">
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" Style="{StaticResource LtrText}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="180" />
-                                    <TextBlock FontSize="11" Foreground="{StaticResource MutedBrush}">
+                                    <TextBlock FontSize="11" Foreground="{DynamicResource MutedBrush}">
                                         <TextBlock.Text>
                                             <MultiBinding Converter="{StaticResource TrKey}" ConverterParameter="origin.">
                                                 <Binding Path="Origin" />
@@ -60,16 +68,16 @@
                 </StackPanel>
 
                 <!-- Estado inferior -->
-                <Border DockPanel.Dock="Bottom" Background="{StaticResource SurfaceBrush}" CornerRadius="12" Padding="14,12">
+                <Border DockPanel.Dock="Bottom" Background="{DynamicResource SurfaceBrush}" CornerRadius="12" Padding="14,12">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Ellipse x:Name="StatusDot" Width="8" Height="8" Margin="0,0,8,0">
                                 <Ellipse.Style>
                                     <Style TargetType="Ellipse">
-                                        <Setter Property="Fill" Value="{StaticResource WarningBrush}" />
+                                        <Setter Property="Fill" Value="{DynamicResource WarningBrush}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding BepInExNeedsInstall}" Value="False">
-                                                <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
+                                                <Setter Property="Fill" Value="{DynamicResource SuccessBrush}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -77,10 +85,10 @@
                             </Ellipse>
                             <TextBlock Text="{Binding BepInExStatusText}" FontSize="12" FontWeight="SemiBold" />
                         </StackPanel>
-                        <TextBlock Text="{Binding ModsActiveText}" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="16,4,0,0" />
+                        <TextBlock Text="{Binding ModsActiveText}" FontSize="12" Foreground="{DynamicResource MutedBrush}" Margin="16,4,0,0" />
                         <StackPanel Orientation="Horizontal" Margin="16,4,0,0" Visibility="{Binding IsGameRunning, Converter={StaticResource BoolToVis}}">
-                            <TextBlock Style="{StaticResource Icon}" Text="&#xE7FC;" FontSize="12" Foreground="{StaticResource SuccessBrush}" />
-                            <TextBlock Text="{loc:Tr side.gameRunning}" Margin="6,0,0,0" FontSize="12" Foreground="{StaticResource SuccessBrush}" />
+                            <TextBlock Style="{StaticResource Icon}" Text="&#xE7FC;" FontSize="12" Foreground="{DynamicResource SuccessBrush}" />
+                            <TextBlock Text="{loc:Tr side.gameRunning}" Margin="6,0,0,0" FontSize="12" Foreground="{DynamicResource SuccessBrush}" />
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -93,14 +101,16 @@
                                  IsChecked="{Binding CurrentPage, Converter={StaticResource Equals}, ConverterParameter=Mods}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{loc:Tr nav.mods}" />
-                            <Border Background="{StaticResource AccentBrush}" CornerRadius="8" Padding="6,0" Margin="8,0,0,0" VerticalAlignment="Center"
+                            <Border Background="{DynamicResource AccentBrush}" CornerRadius="8" Padding="6,0" Margin="8,0,0,0" VerticalAlignment="Center"
                                     Visibility="{Binding UpdateCount, Converter={StaticResource BoolToVis}}">
-                                <TextBlock Text="{Binding UpdateCount}" FontSize="11" FontWeight="Bold" Foreground="White" />
+                                <TextBlock Text="{Binding UpdateCount}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource OnAccentBrush}" />
                             </Border>
                         </StackPanel>
                     </RadioButton>
                     <RadioButton Style="{StaticResource NavButton}" Content="{loc:Tr nav.explore}" Tag="&#xE774;"
                                  IsChecked="{Binding CurrentPage, Converter={StaticResource Equals}, ConverterParameter=Explore}" />
+                    <RadioButton Style="{StaticResource NavButton}" Content="{loc:Tr nav.speedrun}" Tag="&#xE916;"
+                                 IsChecked="{Binding CurrentPage, Converter={StaticResource Equals}, ConverterParameter=Speedrun}" />
                     <RadioButton Style="{StaticResource NavButton}" Content="{loc:Tr nav.config}" Tag="&#xE713;"
                                  IsChecked="{Binding CurrentPage, Converter={StaticResource Equals}, ConverterParameter=Config}" />
                     <RadioButton Style="{StaticResource NavButton}" Content="{loc:Tr nav.profiles}" Tag="&#xE77B;"
@@ -129,7 +139,7 @@
 
             <!-- Barra de progreso de operaciones -->
             <Border Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="32,0,0,24" Padding="16,12"
-                    Background="{StaticResource Surface2Brush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="12"
+                    Background="{DynamicResource Surface2Brush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="12"
                     Width="360" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}">
                 <StackPanel>
                     <TextBlock Text="{Binding BusyText}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Margin="0,0,0,8" />
@@ -144,7 +154,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="{x:Type vm:ToastViewModel}">
                     <Border x:Name="Toast" Margin="0,8,0,0" Padding="14,12" CornerRadius="12" BorderThickness="1"
-                            Background="{StaticResource Surface2Brush}" BorderBrush="{StaticResource BorderBrush}">
+                            Background="{DynamicResource Surface2Brush}" BorderBrush="{DynamicResource BorderBrush}">
                         <Border.Effect>
                             <DropShadowEffect BlurRadius="24" ShadowDepth="4" Opacity="0.45" Color="Black" />
                         </Border.Effect>
@@ -170,15 +180,15 @@
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource Icon}">
                                         <Setter Property="Text" Value="&#xE946;" />
-                                        <Setter Property="Foreground" Value="{StaticResource Accent2Brush}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource Accent2Brush}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Kind}" Value="{x:Static vm:ToastKind.Success}">
                                                 <Setter Property="Text" Value="&#xE73E;" />
-                                                <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                                <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Kind}" Value="{x:Static vm:ToastKind.Error}">
                                                 <Setter Property="Text" Value="&#xE783;" />
-                                                <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+                                                <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -203,9 +213,9 @@
 
         <!-- ================= Overlay de arrastrar y soltar ================= -->
         <Border x:Name="DropOverlay" Grid.ColumnSpan="2" Background="#D90E0E14" Visibility="Collapsed" IsHitTestVisible="False">
-            <Border Margin="40" CornerRadius="24" BorderThickness="2" BorderBrush="{StaticResource AccentBrush}" Background="#14E0344B">
+            <Border Margin="40" CornerRadius="24" BorderThickness="2" BorderBrush="{DynamicResource AccentBrush}" Background="#14E0344B">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Style="{StaticResource Icon}" Text="&#xE896;" FontSize="56" Foreground="{StaticResource AccentBrush}" />
+                    <TextBlock Style="{StaticResource Icon}" Text="&#xE896;" FontSize="56" Foreground="{DynamicResource AccentBrush}" />
                     <TextBlock Text="{loc:Tr drop.title}" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,16,0,6" />
                     <TextBlock Text="{loc:Tr drop.subtitle}" Style="{StaticResource Muted}" HorizontalAlignment="Center" />
                 </StackPanel>
@@ -232,7 +242,7 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type models:GitHubAsset}">
                                 <DockPanel>
-                                    <TextBlock DockPanel.Dock="Right" Text="{Binding Size, Converter={StaticResource Bytes}}" Foreground="{StaticResource MutedBrush}" />
+                                    <TextBlock DockPanel.Dock="Right" Text="{Binding Size, Converter={StaticResource Bytes}}" Foreground="{DynamicResource MutedBrush}" />
                                     <TextBlock Text="{Binding Name}" Style="{StaticResource LtrText}" FontWeight="SemiBold" />
                                 </DockPanel>
                             </DataTemplate>
@@ -246,7 +256,7 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsDanger}" Value="True">
-                                            <Setter Property="Background" Value="{StaticResource DangerBrush}" />
+                                            <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>

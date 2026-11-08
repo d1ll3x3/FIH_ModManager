@@ -18,26 +18,51 @@ public static partial class GitHubService
 
     public sealed record CachedRelease(DateTime FetchedAt, GitHubRelease? Release);
 
-    /// <summary>Mods de Flipping is Hard que aparecen en "Explorar", agrupados por autor en el orden de esta lista.</summary>
+    /// <summary>Mods de Flipping is Hard que aparecen en "Explorar", agrupados por categoría en el orden de esta lista.</summary>
     public static readonly IReadOnlyList<CatalogEntry> Catalog =
     [
-        new("d1ll3x3/FIH_MapEditor", "Map Editor", "edit", "Topper"),
-        new("d1ll3x3/FlippingIsHard_TAS_Tool", "TAS Tool", "timer", "Topper"),
-        new("d1ll3x3/SkinChanger_FlippingIsHard", "Charm Replacer", "palette", "Topper"),
-        new("d1ll3x3/FlippingIsHard-Trainer-BepInEx", "Trainer", "flight", "Topper"),
-        new("d1ll3x3/FIH_Ghost", "Ghost", "person", "Topper"),
-        new("d1ll3x3/ChaosIsHard", "Chaos is Hard", "bolt", "Topper"),
-        new("d1ll3x3/ChainedIsHard", "Chained is Hard", "link", "Topper"),
-        new("d1ll3x3/FirstPersonIsHard", "First Person", "visibility", "Topper"),
-        new("d1ll3x3/FIH_NoRestartNovember", "No Restart November", "lock", "Topper"),
-        new("GamingGamer115/FIH-Korean-Translator", "Korean Translator", "translate", "Gaming_Gamer"),
-        new("GamingGamer115/FIH-Photo-Mode", "Photo Mode", "camera", "Gaming_Gamer"),
-        new("GamingGamer115/FIH-Text-Chat", "Text Chat", "chat", "Gaming_Gamer"),
-        new("fabuleo8796/StickerSwap", "StickerSwap", "image", "Fabuleo8796"),
-        new("fabuleo8796/TripodCam", "Tripod Cam", "videocam", "Fabuleo8796"),
-        new("fabuleo8796/CapeEditor", "Cape Editor", "brush", "Fabuleo8796"),
-        new("fabuleo8796/FlippyAuras", "Flippy Auras", "sparkle", "Fabuleo8796"),
-        new("fabuleo8796/FIHUltra", "FIH Ultra", "brightness", "Fabuleo8796"),
+        new("d1ll3x3/SkinChanger_FlippingIsHard", "Charm Replacer", "palette", "Topper", "cosmetic"),
+        new("fabuleo8796/StickerSwap", "StickerSwap", "image", "Fabuleo8796", "cosmetic"),
+        new("fabuleo8796/CapeEditor", "Cape Editor", "brush", "Fabuleo8796", "cosmetic"),
+        new("fabuleo8796/FlippyAuras", "Flippy Auras", "sparkle", "Fabuleo8796", "cosmetic"),
+        new("fabuleo8796/BodyAccessories", "Body Accessories", "hanger", "Fabuleo8796", "cosmetic"),
+        new("fabuleo8796/FIHUltra", "FIH Ultra", "brightness", "Fabuleo8796", "graphics"),
+        new("d1ll3x3/FirstPersonIsHard", "First Person", "visibility", "Topper", "graphics"),
+        new("GamingGamer115/FIH-Photo-Mode", "Photo Mode", "camera", "Gaming_Gamer", "graphics"),
+        new("fabuleo8796/TripodCam", "Tripod Cam", "videocam", "Fabuleo8796", "graphics"),
+        new("d1ll3x3/FlippingIsHard_TAS_Tool", "TAS Tool", "timer", "Topper", "practice"),
+        new("d1ll3x3/FlippingIsHard-Trainer-BepInEx", "Trainer", "flight", "Topper", "practice"),
+        new("d1ll3x3/FIH_Ghost", "Ghost", "person", "Topper", "practice"),
+        new("d1ll3x3/ChaosIsHard", "Chaos is Hard", "bolt", "Topper", "challenge"),
+        new("d1ll3x3/ChainedIsHard", "Chained is Hard", "link", "Topper", "challenge"),
+        new("d1ll3x3/FIH_NoRestartNovember", "No Restart November", "lock", "Topper", "challenge"),
+        new("d1ll3x3/FIH_GrapplingHook", "Grappling Hook", "hook", "Topper", "challenge"),
+        new("GamingGamer115/FIH-Text-Chat", "Text Chat", "chat", "Gaming_Gamer", "multiplayer"),
+        new("GamingGamer115/FIH-Korean-Translator", "Korean Translator", "translate", "Gaming_Gamer", "multiplayer"),
+        new("d1ll3x3/FIH_MapEditor", "Map Editor", "edit", "Topper", "creation"),
+        new("fabuleo8796/WorldNamer", "World Namer", "tag", "Fabuleo8796", "creation"),
+    ];
+
+    /// <summary>Mods que solo aparecen en la pestaña Speedrun, no en "Explorar".</summary>
+    public static readonly IReadOnlyList<CatalogEntry> SpeedrunOnly =
+    [
+        new("PlixtzlBit/FlippingSpeedrunTools", "Speedrun Tools", "timer", "PlixtzlBit", "practice"),
+    ];
+
+    /// <summary>Pestaña Speedrun. Las reglas de speedrun.com prohíben en runs grabadas los trucos, las herramientas
+    /// de entrenamiento y los mods que cambian las mecánicas; los cosméticos sí se permiten, y el TAS solo en runs TAS.</summary>
+    public static readonly IReadOnlyList<SpeedrunEntry> Speedrun =
+    [
+        new("d1ll3x3/SkinChanger_FlippingIsHard", true),
+        new("fabuleo8796/StickerSwap", true),
+        new("fabuleo8796/CapeEditor", true),
+        new("fabuleo8796/FlippyAuras", true),
+        new("GamingGamer115/FIH-Text-Chat", true),
+        new("GamingGamer115/FIH-Korean-Translator", true),
+        new("d1ll3x3/FlippingIsHard_TAS_Tool", true, "speedrun.note.tas"),
+        new("d1ll3x3/FlippingIsHard-Trainer-BepInEx", false),
+        new("PlixtzlBit/FlippingSpeedrunTools", false),
+        new("d1ll3x3/FIH_Ghost", false),
     ];
 
     private static HttpClient CreateClient()

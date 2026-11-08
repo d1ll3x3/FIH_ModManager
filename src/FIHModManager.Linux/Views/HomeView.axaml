@@ -39,6 +39,12 @@
                                 </Button>
                                 <Button Classes="glass" Command="{Binding PlayVanillaCommand}" Padding="18,12"
                                         Content="{loc:Tr home.playVanilla}" ToolTip.Tip="{loc:Tr home.playVanilla.tip}" />
+                                <Button Classes="glass" Command="{Binding NavigateCommand}" CommandParameter="Speedrun" Padding="18,12">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Classes="icon" Text="{x:Static loc:Icons.Speedrun}" />
+                                        <TextBlock Text="{loc:Tr nav.speedrun}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
                                 <Button Classes="glass" Command="{Binding OpenGameFolderCommand}" Padding="14,12" ToolTip.Tip="{loc:Tr home.openFolder.tip}">
                                     <TextBlock Classes="icon" Text="{x:Static loc:Icons.Folder}" />
                                 </Button>

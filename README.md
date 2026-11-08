@@ -17,8 +17,12 @@ update and configure mods without touching the game files by hand. Runs on **Win
   BepInEx 5 or Unity Mono.
 - **Drag and drop**: drop a `.dll`, `.zip` or folder on the window to install it. Updating a mod
   copies over the existing folder, so maps, skins and other user data are kept.
-- **Explore**: catalog of Flipping is Hard mods, grouped by author, installed straight from their
-  GitHub releases, plus any other repo (`user/repo` or URL). Shows a badge when a new release is out.
+- **Explore**: catalog of Flipping is Hard mods, grouped by category (cosmetics, graphics and camera,
+  practice, challenges, multiplayer and language, creation) with a filter and search, installed straight
+  from their GitHub releases, plus any other repo (`user/repo` or URL). Shows a badge when a new release is out.
+- **Speedrun**: speedrun mods split into the ones allowed and not allowed in runs submitted to
+  [speedrun.com](https://www.speedrun.com/Flipping_Is_Hard), with install buttons and switches. The window
+  takes the colours of the game's speedrun.com page while this tab is open.
 - **Configuration editor**: edits `BepInEx.cfg` and every mod `.cfg` with toggles, dropdowns and
   checkboxes. Only the changed lines are rewritten. Other files (`.json`, `.txt`) open as text.
 - **Profiles**: save the set of enabled mods and switch between sets in one click.

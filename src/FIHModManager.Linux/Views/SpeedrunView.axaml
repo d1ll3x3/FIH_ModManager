@@ -1,0 +1,179 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:FIHModManager.Infrastructure"
+             xmlns:vm="using:FIHModManager.ViewModels"
+             x:Class="FIHModManager.Views.SpeedrunView">
+    <!-- Imita la página de Flipping is Hard en speedrun.com: paneles azules, enlaces verdes y fichas de categoría.
+         Los colores van con DynamicResource porque el tema Speedrun se aplica justo al abrir esta página. -->
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="LinkBrush" Color="#77EE88" />
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="Border.panel">
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource LineBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+        </Style>
+
+        <Style Selector="RadioButton.category">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Name="bd" Background="{DynamicResource Surface2Brush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                            CornerRadius="6" Padding="14,8">
+                        <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="RadioButton.category:pointerover /template/ Border#bd">
+            <Setter Property="Background" Value="{DynamicResource Surface3Brush}" />
+        </Style>
+        <Style Selector="RadioButton.category:checked /template/ Border#bd">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+        </Style>
+        <Style Selector="RadioButton.category:checked">
+            <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}" />
+        </Style>
+
+        <Style Selector="TextBlock.column">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Border.row">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="Border.row:pointerover">
+            <Setter Property="Background" Value="{DynamicResource Surface2Brush}" />
+        </Style>
+    </UserControl.Styles>
+
+    <ScrollViewer>
+        <StackPanel Margin="32,4,32,32">
+            <!-- Cabecera de juego -->
+            <Border Classes="panel" Padding="20">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Classes="primary" VerticalAlignment="Top" Command="{Binding OpenLeaderboardCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Classes="icon" Text="{x:Static loc:Icons.OpenExternal}" FontSize="16" />
+                            <TextBlock Text="{loc:Tr speedrun.leaderboard}" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Border DockPanel.Dock="Left" Width="72" Height="108" CornerRadius="6" ClipToBounds="True">
+                        <Image Source="/Assets/speedrun_cover.png" Stretch="UniformToFill" />
+                    </Border>
+                    <StackPanel Margin="18,0,16,0" VerticalAlignment="Center">
+                        <TextBlock Text="Flipping Is Hard" FontSize="26" FontWeight="Bold" Foreground="{StaticResource LinkBrush}" />
+                        <TextBlock Text="{loc:Tr speedrun.subtitle}" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <!-- Categorías -->
+            <StackPanel Orientation="Horizontal" Margin="0,16,0,0" Spacing="8">
+                <RadioButton Classes="category" GroupName="speedrunCategory"
+                             IsChecked="{Binding SpeedrunCategory, Converter={StaticResource Equals}, ConverterParameter=Allowed}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Classes="icon" Text="{x:Static loc:Icons.Allowed}" FontSize="16" />
+                        <TextBlock Text="{loc:Tr speedrun.allowed}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding SpeedrunAllowedCount}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton Classes="category" GroupName="speedrunCategory"
+                             IsChecked="{Binding SpeedrunCategory, Converter={StaticResource Equals}, ConverterParameter=Banned}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Classes="icon" Text="{x:Static loc:Icons.Banned}" FontSize="16" />
+                        <TextBlock Text="{loc:Tr speedrun.banned}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding SpeedrunBannedCount}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </RadioButton>
+            </StackPanel>
+
+            <!-- Qué significa la categoría elegida -->
+            <Border Classes="panel" Margin="0,12,0,0" Padding="16,12">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Left" Classes="icon" Text="{x:Static loc:Icons.Info}" Foreground="{DynamicResource Accent2Brush}"
+                               Margin="0,0,12,0" VerticalAlignment="Top" />
+                    <Panel>
+                        <TextBlock Text="{loc:Tr speedrun.allowed.text}" TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource TextBrush}"
+                                   IsVisible="{Binding SpeedrunCategory, Converter={StaticResource Equals}, ConverterParameter=Allowed}" />
+                        <TextBlock Text="{loc:Tr speedrun.banned.text}" TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource TextBrush}"
+                                   IsVisible="{Binding SpeedrunCategory, Converter={StaticResource Equals}, ConverterParameter=Banned}" />
+                    </Panel>
+                </DockPanel>
+            </Border>
+
+            <!-- Lista con el aspecto de la tabla de clasificación -->
+            <Border Classes="panel" Margin="0,12,0,0" ClipToBounds="True">
+                <StackPanel>
+                    <Grid Margin="16,12" ColumnDefinitions="52,*,130,90,150">
+                        <TextBlock Grid.Column="1" Classes="column" Text="{loc:Tr speedrun.col.mod}" />
+                        <TextBlock Grid.Column="2" Classes="column" Text="{loc:Tr speedrun.col.author}" />
+                        <TextBlock Grid.Column="3" Classes="column" Text="{loc:Tr speedrun.col.version}" />
+                        <TextBlock Grid.Column="4" Classes="column" Text="{loc:Tr speedrun.col.status}" HorizontalAlignment="Right" />
+                    </Grid>
+
+                    <ItemsControl ItemsSource="{Binding SpeedrunItems}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="vm:SpeedrunItemViewModel">
+                                <Border Classes="row" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" Padding="16,12">
+                                    <Grid ColumnDefinitions="52,*,130,90,150">
+                                        <Border Width="38" Height="38" CornerRadius="6" Background="{DynamicResource AccentGradient}"
+                                                HorizontalAlignment="Left" VerticalAlignment="Top">
+                                            <TextBlock Classes="icon" Text="{Binding Item.Icon, Converter={StaticResource IconGlyph}}" FontSize="20"
+                                                       Foreground="{DynamicResource OnAccentBrush}" />
+                                        </Border>
+
+                                        <StackPanel Grid.Column="1" Margin="0,0,16,0" VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                                <Button Classes="ghost" Padding="0" ToolTip.Tip="{loc:Tr explore.viewOnGitHub}"
+                                                        Command="{Binding $parent[UserControl].DataContext.OpenRepoCommand}" CommandParameter="{Binding Item.Repo}">
+                                                    <TextBlock Text="{Binding Item.Title}" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource LinkBrush}" />
+                                                </Button>
+                                                <!-- Condición de uso, p. ej. "solo para runs TAS" -->
+                                                <Border Classes="badge" Background="{DynamicResource Accent2SoftBrush}"
+                                                        IsVisible="{Binding Note, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                                    <TextBlock Text="{Binding Note}" Foreground="{DynamicResource Accent2Brush}" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Item.Description}" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,0" />
+                                            <!-- Un mod no permitido que está activado invalidaría la run. Paneles anidados en vez de
+                                                 BoolConverters.And: sin mod instalado, Installed.IsEnabled no da un bool y And deja el panel visible. -->
+                                            <Panel IsVisible="{Binding Banned}">
+                                                <Panel IsVisible="{Binding Item.IsInstalled}">
+                                                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0" Spacing="6" IsVisible="{Binding Item.Installed.IsEnabled}">
+                                                        <TextBlock Classes="icon" Text="{x:Static loc:Icons.Warning}" FontSize="14" Foreground="{DynamicResource WarningBrush}" />
+                                                        <TextBlock Text="{loc:Tr speedrun.enabledWarning}" FontSize="12" Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Panel>
+                                            </Panel>
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Column="2" Text="{Binding Item.Author}" FontSize="13" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="3" Text="{Binding Item.LatestText}" FontSize="13" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" />
+
+                                        <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="10">
+                                            <ToggleSwitch Classes="switch" IsChecked="{Binding Item.Installed.IsEnabled}" VerticalAlignment="Center"
+                                                          ToolTip.Tip="{loc:Tr mods.toggle.tip}" IsVisible="{Binding Item.IsInstalled}" />
+                                            <Button Classes="primary" Padding="12,6" Content="{Binding Item.ActionText}"
+                                                    Command="{Binding $parent[UserControl].DataContext.InstallCatalogCommand}" CommandParameter="{Binding Item}"
+                                                    IsVisible="{Binding Item.IsPrimaryAction}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

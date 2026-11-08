@@ -9,13 +9,15 @@ public sealed partial class MainViewModel
 {
     private string _repoInput = "";
     private string _catalogFilter = "";
+    private string _catalogCategory = "All";
     private string? _catalogError;
     private bool _catalogLoaded;
     private IReadOnlyList<CatalogGroup> _catalogGroups = [];
 
+    /// <summary>Todos los mods conocidos: los de "Explorar" y los que solo salen en la pestaña Speedrun.</summary>
     public ObservableCollection<CatalogItemViewModel> Catalog { get; } = [];
 
-    /// <summary>Catálogo agrupado por autor con la búsqueda aplicada; los autores sin resultados no aparecen.</summary>
+    /// <summary>Catálogo de "Explorar" agrupado por categoría con la búsqueda y el filtro aplicados; las categorías vacías no aparecen.</summary>
     public IReadOnlyList<CatalogGroup> CatalogGroups
     {
         get => _catalogGroups;
@@ -36,6 +38,16 @@ public sealed partial class MainViewModel
         }
     }
 
+    /// <summary>"All" o una categoría ("cosmetic", "graphics"…): las fichas de filtro de "Explorar".</summary>
+    public string CatalogCategory
+    {
+        get => _catalogCategory;
+        set
+        {
+            if (Set(ref _catalogCategory, value)) RefreshCatalogGroups();
+        }
+    }
+
     public string RepoInput { get => _repoInput; set => Set(ref _repoInput, value); }
 
     public string? CatalogError { get => _catalogError; private set => Set(ref _catalogError, value); }
@@ -47,8 +59,9 @@ public sealed partial class MainViewModel
 
     private void InitExplore()
     {
-        foreach (var entry in GitHubService.Catalog) Catalog.Add(new CatalogItemViewModel(entry));
+        foreach (var entry in GitHubService.Catalog.Concat(GitHubService.SpeedrunOnly)) Catalog.Add(new CatalogItemViewModel(entry));
         RefreshCatalogGroups();
+        InitSpeedrun();
 
         InstallCatalogCommand = new AsyncCommand(p => InstallFromRepoAsync(((CatalogItemViewModel)p!).Repo, forceRefresh: false), _ => HasGame && !IsBusy);
         InstallRepoInputCommand = new AsyncCommand(InstallFromInputAsync, () => HasGame && !IsBusy && !string.IsNullOrWhiteSpace(RepoInput));
@@ -57,8 +70,9 @@ public sealed partial class MainViewModel
     }
 
     private void RefreshCatalogGroups() =>
-        CatalogGroups = Catalog.Where(c => c.Matches(CatalogFilter))
-            .GroupBy(c => c.Entry.Author)
+        CatalogGroups = Catalog.Where(c => GitHubService.Catalog.Contains(c.Entry) && c.Matches(CatalogFilter)
+                                           && (CatalogCategory == "All" || c.Entry.Category == CatalogCategory))
+            .GroupBy(c => c.Entry.Category)
             .Select(g => new CatalogGroup(g.Key, g.ToList()))
             .ToList();
 

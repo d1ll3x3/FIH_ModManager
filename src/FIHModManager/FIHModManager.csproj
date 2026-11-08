@@ -17,6 +17,7 @@
   <ItemGroup>
     <Resource Include="Resources\icon.png" />
     <Resource Include="Resources\icon.ico" />
+    <Resource Include="Resources\speedrun_cover.png" />
   </ItemGroup>
 
   <ItemGroup>

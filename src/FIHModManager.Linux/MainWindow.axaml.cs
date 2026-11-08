@@ -41,10 +41,18 @@ public partial class MainWindow : Window
             Dispatcher.UIThread.Post(() => DialogInput.Focus(), DispatcherPriority.Input);
     }
 
-    private void ShowPage(string page) => PageHost.Content = page switch
+    // El tema va antes que la página: sus StaticResource se resuelven al crearla y no deben coger los colores de Speedrun.
+    private void ShowPage(string page)
+    {
+        SpeedrunTheme.Apply(page == "Speedrun");
+        PageHost.Content = CreatePage(page);
+    }
+
+    private static Control CreatePage(string page) => page switch
     {
         "Mods" => new ModsView(),
         "Explore" => new ExploreView(),
+        "Speedrun" => new SpeedrunView(),
         "Config" => new ConfigView(),
         "Profiles" => new ProfilesView(),
         "Settings" => new SettingsView(),

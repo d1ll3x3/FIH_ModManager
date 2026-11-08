@@ -77,7 +77,8 @@ public sealed partial class MainViewModel : ObservableObject
         set
         {
             if (!Set(ref _currentPage, value)) return;
-            if (value == "Explore") _ = LoadCatalogAsync(force: false);
+            OnPropertyChanged(nameof(IsSpeedrunPage));
+            if (value is "Explore" or "Speedrun") _ = LoadCatalogAsync(force: false);
             if (value == "Config") LoadConfigFiles();
         }
     }
@@ -145,6 +146,7 @@ public sealed partial class MainViewModel : ObservableObject
         RefreshAll();
         foreach (var m in Mods) m.RefreshAll();
         foreach (var c in Catalog) c.RefreshAll();
+        RefreshCatalogGroups();
         foreach (var p in Profiles) p.RefreshAll();
         foreach (var e in SelectedConfig?.Sections.SelectMany(s => s.Entries) ?? []) e.RefreshAll();
     }

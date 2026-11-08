@@ -93,6 +93,10 @@ public static class Icons
     public const string CfgFile = "";
     public const string TextFile = "";
     public const string Game = "";
+    public const string Speedrun = "";
+    public const string Allowed = "";
+    public const string Banned = "";
+    public const string OpenExternal = "";
 
     private static readonly Dictionary<string, string> Catalog = new()
     {
@@ -113,6 +117,9 @@ public static class Icons
         ["brush"] = "",
         ["sparkle"] = "",
         ["brightness"] = "",
+        ["hook"] = "",
+        ["hanger"] = "",
+        ["tag"] = "",
     };
 
     public static string ForCatalog(string? name) => name is not null && Catalog.TryGetValue(name, out var g) ? g : Mods;

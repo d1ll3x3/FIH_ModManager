@@ -6,32 +6,37 @@
         x:Class="FIHModManager.MainWindow"
         Title="FIH Mod Manager" Width="1220" Height="780" MinWidth="980" MinHeight="640"
         WindowStartupLocation="CenterScreen" Icon="/Assets/icon.ico"
-        Background="{StaticResource BgBrush}" Foreground="{StaticResource TextBrush}"
+        Background="{DynamicResource BgBrush}" Foreground="{DynamicResource TextBrush}"
         DragDrop.AllowDrop="True">
 
     <Panel>
         <Grid ColumnDefinitions="260,*">
             <!-- ================= Barra lateral ================= -->
-            <Border Grid.Column="0" Background="{StaticResource SidebarBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0">
+            <Border Grid.Column="0" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,0,1,0">
                 <DockPanel Margin="16,18,16,16">
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4,0,0,22" Spacing="12">
                         <Border Width="42" Height="42" CornerRadius="11" ClipToBounds="True">
-                            <Image Source="/Assets/icon.png" Stretch="UniformToFill" />
+                            <Panel>
+                                <Image Source="/Assets/icon.png" Stretch="UniformToFill" IsVisible="{Binding !IsSpeedrunPage}" />
+                                <!-- Portada vertical: se ve su parte de arriba, con el título del juego -->
+                                <Image Source="/Assets/speedrun_cover.png" Width="42" Height="63" Stretch="Uniform" VerticalAlignment="Top"
+                                       IsVisible="{Binding IsSpeedrunPage}" />
+                            </Panel>
                         </Border>
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock Text="FIH Mod Manager" FontSize="16" FontWeight="Bold" />
-                            <TextBlock Text="Flipping is Hard" FontSize="12" Foreground="{StaticResource MutedBrush}" />
+                            <TextBlock Text="Flipping is Hard" FontSize="12" Foreground="{DynamicResource MutedBrush}" />
                         </StackPanel>
                     </StackPanel>
 
                     <StackPanel DockPanel.Dock="Top" Margin="0,0,0,18">
-                        <TextBlock Text="{loc:Tr side.installation}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource MutedBrush}" Margin="4,0,0,6" />
+                        <TextBlock Text="{loc:Tr side.installation}" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource MutedBrush}" Margin="4,0,0,6" />
                         <ComboBox ItemsSource="{Binding Games}" SelectedItem="{Binding SelectedGame}" HorizontalAlignment="Stretch" MinHeight="54">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="models:GameInstall">
                                     <StackPanel>
                                         <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="180" FlowDirection="LeftToRight" />
-                                        <TextBlock FontSize="11" Foreground="{StaticResource MutedBrush}">
+                                        <TextBlock FontSize="11" Foreground="{DynamicResource MutedBrush}">
                                             <TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource TrKey}" ConverterParameter="origin.">
                                                     <Binding Path="Origin" />
@@ -45,17 +50,17 @@
                         </ComboBox>
                     </StackPanel>
 
-                    <Border DockPanel.Dock="Bottom" Background="{StaticResource SurfaceBrush}" CornerRadius="12" Padding="14,12">
+                    <Border DockPanel.Dock="Bottom" Background="{DynamicResource SurfaceBrush}" CornerRadius="12" Padding="14,12">
                         <StackPanel Spacing="4">
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Ellipse Width="8" Height="8" Fill="{StaticResource WarningBrush}" IsVisible="{Binding BepInExNeedsInstall}" />
-                                <Ellipse Width="8" Height="8" Fill="{StaticResource SuccessBrush}" IsVisible="{Binding !BepInExNeedsInstall}" />
+                                <Ellipse Width="8" Height="8" Fill="{DynamicResource WarningBrush}" IsVisible="{Binding BepInExNeedsInstall}" />
+                                <Ellipse Width="8" Height="8" Fill="{DynamicResource SuccessBrush}" IsVisible="{Binding !BepInExNeedsInstall}" />
                                 <TextBlock Text="{Binding BepInExStatusText}" FontSize="12" FontWeight="SemiBold" />
                             </StackPanel>
-                            <TextBlock Text="{Binding ModsActiveText}" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="16,0,0,0" />
+                            <TextBlock Text="{Binding ModsActiveText}" FontSize="12" Foreground="{DynamicResource MutedBrush}" Margin="16,0,0,0" />
                             <StackPanel Orientation="Horizontal" Spacing="6" Margin="16,0,0,0" IsVisible="{Binding IsGameRunning}">
-                                <TextBlock Classes="icon" Text="{x:Static loc:Icons.Game}" FontSize="14" Foreground="{StaticResource SuccessBrush}" />
-                                <TextBlock Text="{loc:Tr side.gameRunning}" FontSize="12" Foreground="{StaticResource SuccessBrush}" />
+                                <TextBlock Classes="icon" Text="{x:Static loc:Icons.Game}" FontSize="14" Foreground="{DynamicResource SuccessBrush}" />
+                                <TextBlock Text="{loc:Tr side.gameRunning}" FontSize="12" Foreground="{DynamicResource SuccessBrush}" />
                             </StackPanel>
                         </StackPanel>
                     </Border>
@@ -67,14 +72,16 @@
                                      IsChecked="{Binding CurrentPage, Converter={StaticResource Equals}, ConverterParameter=Mods}">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <TextBlock Text="{loc:Tr nav.mods}" />
-                                <Border Background="{StaticResource AccentBrush}" CornerRadius="8" Padding="6,0" VerticalAlignment="Center"
+                                <Border Background="{DynamicResource AccentBrush}" CornerRadius="8" Padding="6,0" VerticalAlignment="Center"
                                         IsVisible="{Binding UpdateCount, Converter={StaticResource HasItems}}">
-                                    <TextBlock Text="{Binding UpdateCount}" FontSize="11" FontWeight="Bold" Foreground="White" />
+                                    <TextBlock Text="{Binding UpdateCount}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource OnAccentBrush}" />
                                 </Border>
                             </StackPanel>
                         </RadioButton>
                         <RadioButton Classes="nav" GroupName="nav" Content="{loc:Tr nav.explore}" Tag="{x:Static loc:Icons.Explore}"
                                      IsChecked="{Binding CurrentPage, Converter={StaticResource Equals}, ConverterParameter=Explore}" />
+                        <RadioButton Classes="nav" GroupName="nav" Content="{loc:Tr nav.speedrun}" Tag="{x:Static loc:Icons.Speedrun}"
+                                     IsChecked="{Binding CurrentPage, Converter={StaticResource Equals}, ConverterParameter=Speedrun}" />
                         <RadioButton Classes="nav" GroupName="nav" Content="{loc:Tr nav.config}" Tag="{x:Static loc:Icons.Config}"
                                      IsChecked="{Binding CurrentPage, Converter={StaticResource Equals}, ConverterParameter=Config}" />
                         <RadioButton Classes="nav" GroupName="nav" Content="{loc:Tr nav.profiles}" Tag="{x:Static loc:Icons.Profiles}"
@@ -94,7 +101,7 @@
                 </TransitioningContentControl>
 
                 <Border VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="32,0,0,24" Padding="16,12" Width="360"
-                        Background="{StaticResource Surface2Brush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" CornerRadius="12"
+                        Background="{DynamicResource Surface2Brush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="12"
                         IsVisible="{Binding IsBusy}">
                     <StackPanel Spacing="8">
                         <TextBlock Text="{Binding BusyText}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
@@ -109,15 +116,15 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="vm:ToastViewModel">
                     <Border Margin="0,8,0,0" Padding="14,12" CornerRadius="12" BorderThickness="1"
-                            Background="{StaticResource Surface2Brush}" BorderBrush="{StaticResource LineBrush}"
+                            Background="{DynamicResource Surface2Brush}" BorderBrush="{DynamicResource LineBrush}"
                             BoxShadow="0 6 24 0 #73000000">
                         <DockPanel>
                             <Panel DockPanel.Dock="Left" Margin="0,0,12,0" VerticalAlignment="Top">
-                                <TextBlock Classes="icon" Text="{x:Static loc:Icons.Info}" Foreground="{StaticResource Accent2Brush}"
+                                <TextBlock Classes="icon" Text="{x:Static loc:Icons.Info}" Foreground="{DynamicResource Accent2Brush}"
                                            IsVisible="{Binding Kind, Converter={StaticResource Equals}, ConverterParameter=Info}" />
-                                <TextBlock Classes="icon" Text="{x:Static loc:Icons.Ok}" Foreground="{StaticResource SuccessBrush}"
+                                <TextBlock Classes="icon" Text="{x:Static loc:Icons.Ok}" Foreground="{DynamicResource SuccessBrush}"
                                            IsVisible="{Binding Kind, Converter={StaticResource Equals}, ConverterParameter=Success}" />
-                                <TextBlock Classes="icon" Text="{x:Static loc:Icons.Error}" Foreground="{StaticResource DangerBrush}"
+                                <TextBlock Classes="icon" Text="{x:Static loc:Icons.Error}" Foreground="{DynamicResource DangerBrush}"
                                            IsVisible="{Binding Kind, Converter={StaticResource Equals}, ConverterParameter=Error}" />
                             </Panel>
                             <Button DockPanel.Dock="Right" Classes="icon" Width="22" Height="22" FontSize="14" Content="{x:Static loc:Icons.Close}"
@@ -132,9 +139,9 @@
 
         <!-- ================= Arrastrar y soltar ================= -->
         <Border Name="DropOverlay" Background="#D90E0E14" IsVisible="False" IsHitTestVisible="False">
-            <Border Margin="40" CornerRadius="24" BorderThickness="2" BorderBrush="{StaticResource AccentBrush}" Background="#14E0344B">
+            <Border Margin="40" CornerRadius="24" BorderThickness="2" BorderBrush="{DynamicResource AccentBrush}" Background="#14E0344B">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="6">
-                    <TextBlock Classes="icon" Text="{x:Static loc:Icons.Download}" FontSize="56" Foreground="{StaticResource AccentBrush}" />
+                    <TextBlock Classes="icon" Text="{x:Static loc:Icons.Download}" FontSize="56" Foreground="{DynamicResource AccentBrush}" />
                     <TextBlock Text="{loc:Tr drop.title}" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,0" />
                     <TextBlock Text="{loc:Tr drop.subtitle}" Classes="muted" HorizontalAlignment="Center" />
                 </StackPanel>
@@ -158,7 +165,7 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="models:GitHubAsset">
                                 <DockPanel>
-                                    <TextBlock DockPanel.Dock="Right" Text="{Binding Size, Converter={StaticResource Bytes}}" Foreground="{StaticResource MutedBrush}" />
+                                    <TextBlock DockPanel.Dock="Right" Text="{Binding Size, Converter={StaticResource Bytes}}" Foreground="{DynamicResource MutedBrush}" />
                                     <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
                                 </DockPanel>
                             </DataTemplate>

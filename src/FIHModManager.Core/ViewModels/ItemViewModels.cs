@@ -70,7 +70,17 @@ public sealed class ModItemViewModel(ModEntry entry, ModSource? source, string? 
         || Entry.Key.Contains(filter, StringComparison.OrdinalIgnoreCase);
 }
 
-public sealed record CatalogGroup(string Author, IReadOnlyList<CatalogItemViewModel> Items);
+public sealed record CatalogGroup(string Category, IReadOnlyList<CatalogItemViewModel> Items)
+{
+    public string Title => Loc.T("cat.group." + Category);
+}
+
+/// <summary>Fila de la pestaña Speedrun: el mod del catálogo, si se permite en runs y su condición de uso, si la tiene.</summary>
+public sealed record SpeedrunItemViewModel(CatalogItemViewModel Item, bool Allowed, string? NoteKey)
+{
+    public bool Banned => !Allowed;
+    public string? Note => NoteKey is null ? null : Loc.T(NoteKey);
+}
 
 public sealed class CatalogItemViewModel(CatalogEntry entry) : ObservableObject
 {
@@ -84,6 +94,7 @@ public sealed class CatalogItemViewModel(CatalogEntry entry) : ObservableObject
     public string Description => Loc.T("cat.desc." + Entry.Repo.Split('/')[1]);
     public string Icon => Entry.Icon;
     public string Repo => Entry.Repo;
+    public string Author => Entry.Author;
 
     public GitHubRelease? Release
     {

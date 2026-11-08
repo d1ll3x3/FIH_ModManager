@@ -44,6 +44,24 @@
                 <TextBlock Text="{loc:Tr explore.section}" Style="{StaticResource H2}" VerticalAlignment="Center" />
             </DockPanel>
 
+            <!-- Filtro por categoría -->
+            <WrapPanel Margin="0,0,0,8">
+                <RadioButton Style="{StaticResource FilterChip}" GroupName="CatalogCategory" Content="{loc:Tr explore.filter.all}" Margin="0,0,8,8"
+                             IsChecked="{Binding CatalogCategory, Converter={StaticResource Equals}, ConverterParameter=All}" />
+                <RadioButton Style="{StaticResource FilterChip}" GroupName="CatalogCategory" Content="{loc:Tr cat.group.cosmetic}" Margin="0,0,8,8"
+                             IsChecked="{Binding CatalogCategory, Converter={StaticResource Equals}, ConverterParameter=cosmetic}" />
+                <RadioButton Style="{StaticResource FilterChip}" GroupName="CatalogCategory" Content="{loc:Tr cat.group.graphics}" Margin="0,0,8,8"
+                             IsChecked="{Binding CatalogCategory, Converter={StaticResource Equals}, ConverterParameter=graphics}" />
+                <RadioButton Style="{StaticResource FilterChip}" GroupName="CatalogCategory" Content="{loc:Tr cat.group.practice}" Margin="0,0,8,8"
+                             IsChecked="{Binding CatalogCategory, Converter={StaticResource Equals}, ConverterParameter=practice}" />
+                <RadioButton Style="{StaticResource FilterChip}" GroupName="CatalogCategory" Content="{loc:Tr cat.group.challenge}" Margin="0,0,8,8"
+                             IsChecked="{Binding CatalogCategory, Converter={StaticResource Equals}, ConverterParameter=challenge}" />
+                <RadioButton Style="{StaticResource FilterChip}" GroupName="CatalogCategory" Content="{loc:Tr cat.group.multiplayer}" Margin="0,0,8,8"
+                             IsChecked="{Binding CatalogCategory, Converter={StaticResource Equals}, ConverterParameter=multiplayer}" />
+                <RadioButton Style="{StaticResource FilterChip}" GroupName="CatalogCategory" Content="{loc:Tr cat.group.creation}" Margin="0,0,8,8"
+                             IsChecked="{Binding CatalogCategory, Converter={StaticResource Equals}, ConverterParameter=creation}" />
+            </WrapPanel>
+
             <TextBlock Text="{loc:Tr explore.noMatches}" Style="{StaticResource Muted}" HorizontalAlignment="Center" Margin="0,24,0,0"
                        Visibility="{Binding NoCatalogMatches, Converter={StaticResource BoolToVis}}" />
 
@@ -51,10 +69,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:CatalogGroup}">
                         <StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="2,6,0,12">
-                                <TextBlock Style="{StaticResource Icon}" Text="&#xE77B;" FontSize="14" Foreground="{StaticResource MutedBrush}" Margin="0,0,8,0" />
-                                <TextBlock Text="{Binding Author}" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource MutedBrush}" />
-                            </StackPanel>
+                            <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource MutedBrush}" Margin="2,6,0,12" />
                             <ItemsControl ItemsSource="{Binding Items}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -102,6 +117,10 @@
                                                                 Visibility="{Binding IsInstalled, Converter={StaticResource BoolToVis}}">
                                                             <TextBlock Text="{Binding InstalledText}" Foreground="{StaticResource SuccessBrush}" />
                                                         </Border>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                                        <TextBlock Style="{StaticResource Icon}" Text="&#xE77B;" FontSize="11" Foreground="{StaticResource MutedBrush}" Margin="0,0,5,0" />
+                                                        <TextBlock Text="{Binding Author}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource MutedBrush}" />
                                                     </StackPanel>
                                                     <TextBlock Text="{Binding Description}" Style="{StaticResource Muted}" Margin="0,6,0,0" />
                                                     <TextBlock Text="{Binding ReleaseInfo}" Style="{StaticResource Muted}" FontSize="11" Margin="0,6,0,0"

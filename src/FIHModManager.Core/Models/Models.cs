@@ -73,5 +73,10 @@ public sealed record GitHubAsset(string Name, string DownloadUrl, long Size, lon
 
 public sealed record GitHubRelease(string Repo, string Tag, string Name, string Body, DateTime PublishedAt, string HtmlUrl, IReadOnlyList<GitHubAsset> Assets);
 
-/// <summary>Icon es un nombre neutro ("edit", "timer"…); cada interfaz lo traduce a su fuente de iconos.</summary>
-public sealed record CatalogEntry(string Repo, string Title, string Icon, string Author);
+/// <summary>Icon es un nombre neutro ("edit", "timer"…); cada interfaz lo traduce a su fuente de iconos.
+/// Category es la sección de "Explorar" ("cosmetic", "graphics"…), con su nombre en cat.group.&lt;Category&gt;.</summary>
+public sealed record CatalogEntry(string Repo, string Title, string Icon, string Author, string Category);
+
+/// <summary>Mod de la pestaña Speedrun: Allowed indica si se puede usar en una run grabada para speedrun.com.
+/// NoteKey es una clave de traducción opcional con una condición de uso (p. ej. "solo para runs TAS").</summary>
+public sealed record SpeedrunEntry(string Repo, bool Allowed, string? NoteKey = null);
