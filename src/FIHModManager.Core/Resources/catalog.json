@@ -87,6 +87,9 @@
       "author": "Fabuleo8796",
       "category": "cosmetic",
       "icon": "hanger",
+      "speedrun": {
+        "allowed": true
+      },
       "description": {
         "en": "Model accessories for Flippy in Blender and wear them live in game (X to open).",
         "es": "Modela accesorios para Flippy en Blender y llévalos en directo en el juego (X para abrir).",
@@ -104,6 +107,9 @@
       "author": "Fabuleo8796",
       "category": "graphics",
       "icon": "brightness",
+      "speedrun": {
+        "allowed": true
+      },
       "description": {
         "en": "Cinematic graphics: full resolution, better shadows, TAA, god rays, bloom and depth of field (U to open).",
         "es": "Gráficos cinematográficos: resolución completa, mejores sombras, TAA, rayos de luz, bloom y profundidad de campo (U para abrir).",
