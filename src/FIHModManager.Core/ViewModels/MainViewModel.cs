@@ -77,7 +77,6 @@ public sealed partial class MainViewModel : ObservableObject
         set
         {
             if (!Set(ref _currentPage, value)) return;
-            OnPropertyChanged(nameof(IsSpeedrunPage));
             if (value is "Explore" or "Speedrun") _ = LoadCatalogAsync(force: false);
             if (value == "Config") LoadConfigFiles();
         }
@@ -146,6 +145,7 @@ public sealed partial class MainViewModel : ObservableObject
         RefreshAll();
         foreach (var m in Mods) m.RefreshAll();
         foreach (var c in Catalog) c.RefreshAll();
+        RefreshCatalogAuthors();
         RefreshCatalogGroups();
         foreach (var p in Profiles) p.RefreshAll();
         foreach (var e in SelectedConfig?.Sections.SelectMany(s => s.Entries) ?? []) e.RefreshAll();
@@ -341,7 +341,15 @@ public sealed partial class MainViewModel : ObservableObject
         BepInEx = await Task.Run(() => BepInExService.GetStatus(game));
         RefreshProton();
         _state = JsonStore.LoadState(game);
-        await ReloadModsAsync();
+        IsLoadingMods = true;
+        try
+        {
+            await ReloadModsAsync();
+        }
+        finally
+        {
+            IsLoadingMods = false;
+        }
         LoadProfiles();
         if (CurrentPage == "Config") LoadConfigFiles();
         _ = CheckUpdatesAsync(silent: true);

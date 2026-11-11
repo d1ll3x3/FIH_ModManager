@@ -98,37 +98,20 @@
                 </DockPanel>
             </Border>
 
-            <!-- Categorías -->
-            <StackPanel Orientation="Horizontal" Margin="0,16,0,0" Spacing="8">
-                <RadioButton Classes="category" GroupName="speedrunCategory"
-                             IsChecked="{Binding SpeedrunCategory, Converter={StaticResource Equals}, ConverterParameter=Allowed}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Classes="icon" Text="{x:Static loc:Icons.Allowed}" FontSize="16" />
-                        <TextBlock Text="{loc:Tr speedrun.allowed}" VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding SpeedrunAllowedCount}" VerticalAlignment="Center" />
-                    </StackPanel>
-                </RadioButton>
-                <RadioButton Classes="category" GroupName="speedrunCategory"
-                             IsChecked="{Binding SpeedrunCategory, Converter={StaticResource Equals}, ConverterParameter=Banned}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Classes="icon" Text="{x:Static loc:Icons.Banned}" FontSize="16" />
-                        <TextBlock Text="{loc:Tr speedrun.banned}" VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding SpeedrunBannedCount}" VerticalAlignment="Center" />
-                    </StackPanel>
-                </RadioButton>
-            </StackPanel>
+            <!-- Única categoría, con el aspecto de la ficha elegida de speedrun.com: los no permitidos ya salen en el aviso de arriba -->
+            <RadioButton Classes="category" IsChecked="True" IsHitTestVisible="False" Focusable="False" HorizontalAlignment="Left" Margin="0,16,0,0">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Classes="icon" Text="{x:Static loc:Icons.Allowed}" FontSize="16" />
+                    <TextBlock Text="{loc:Tr speedrun.allowed}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding SpeedrunAllowedCount}" VerticalAlignment="Center" />
+                </StackPanel>
+            </RadioButton>
 
-            <!-- Qué significa la categoría elegida -->
             <Border Classes="panel" Margin="0,12,0,0" Padding="16,12">
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Left" Classes="icon" Text="{x:Static loc:Icons.Info}" Foreground="{DynamicResource Accent2Brush}"
                                Margin="0,0,12,0" VerticalAlignment="Top" />
-                    <Panel>
-                        <TextBlock Text="{loc:Tr speedrun.allowed.text}" TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource TextBrush}"
-                                   IsVisible="{Binding SpeedrunCategory, Converter={StaticResource Equals}, ConverterParameter=Allowed}" />
-                        <TextBlock Text="{loc:Tr speedrun.banned.text}" TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource TextBrush}"
-                                   IsVisible="{Binding SpeedrunCategory, Converter={StaticResource Equals}, ConverterParameter=Banned}" />
-                    </Panel>
+                    <TextBlock Text="{loc:Tr speedrun.allowed.text}" TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource TextBrush}" />
                 </DockPanel>
             </Border>
 
@@ -166,16 +149,6 @@
                                                 </Border>
                                             </StackPanel>
                                             <TextBlock Text="{Binding Item.Description}" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,0" />
-                                            <!-- Un mod no permitido que está activado invalidaría la run. Paneles anidados en vez de
-                                                 BoolConverters.And: sin mod instalado, Installed.IsEnabled no da un bool y And deja el panel visible. -->
-                                            <Panel IsVisible="{Binding Banned}">
-                                                <Panel IsVisible="{Binding Item.IsInstalled}">
-                                                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0" Spacing="6" IsVisible="{Binding Item.Installed.IsEnabled}">
-                                                        <TextBlock Classes="icon" Text="{x:Static loc:Icons.Warning}" FontSize="14" Foreground="{DynamicResource WarningBrush}" />
-                                                        <TextBlock Text="{loc:Tr speedrun.enabledWarning}" FontSize="12" Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Center" />
-                                                    </StackPanel>
-                                                </Panel>
-                                            </Panel>
                                         </StackPanel>
 
                                         <TextBlock Grid.Column="2" Text="{Binding Item.Author}" FontSize="13" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />

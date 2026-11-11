@@ -95,7 +95,6 @@ public static class Icons
     public const string Game = "";
     public const string Speedrun = "";
     public const string Allowed = "";
-    public const string Banned = "";
     public const string OpenExternal = "";
 
     private static readonly Dictionary<string, string> Catalog = new()

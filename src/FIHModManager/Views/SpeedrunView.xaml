@@ -4,7 +4,7 @@
              xmlns:loc="clr-namespace:FIHModManager.Infrastructure"
              xmlns:vm="clr-namespace:FIHModManager.ViewModels;assembly=FIHModManager.Core"
              Style="{StaticResource PageStyle}">
-    <!-- Imita la página de Flipping is Hard en speedrun.com: paneles azules, enlaces verdes y fichas de categoría.
+    <!-- Imita la página de Flipping is Hard en speedrun.com: paneles azules, enlaces verdes y ficha de categoría.
          Los colores van con DynamicResource porque el tema Speedrun se aplica justo al abrir esta página. -->
     <UserControl.Resources>
         <SolidColorBrush x:Key="LinkBrush" Color="#77EE88" />
@@ -14,35 +14,6 @@
             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="8" />
-        </Style>
-
-        <Style x:Key="CategoryChip" TargetType="RadioButton">
-            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Margin" Value="0,0,8,0" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="RadioButton">
-                        <Border x:Name="Bd" Background="{DynamicResource Surface2Brush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-                                CornerRadius="6" Padding="14,8">
-                            <ContentPresenter VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Surface3Brush}" />
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentBrush}" />
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
-                                <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
         </Style>
 
         <Style x:Key="ColumnHeader" TargetType="TextBlock">
@@ -97,40 +68,18 @@
                 </DockPanel>
             </Border>
 
-            <!-- Categorías -->
-            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
-                <RadioButton Style="{StaticResource CategoryChip}" GroupName="SpeedrunCategory"
-                             IsChecked="{Binding SpeedrunCategory, Converter={StaticResource Equals}, ConverterParameter=Allowed}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource Icon}" Text="&#xE930;" FontSize="13" Margin="0,0,8,0" />
-                        <TextBlock><Run Text="{loc:Tr speedrun.allowed}" /><Run Text="  " /><Run Text="{Binding SpeedrunAllowedCount, Mode=OneWay}" /></TextBlock>
-                    </StackPanel>
-                </RadioButton>
-                <RadioButton Style="{StaticResource CategoryChip}" GroupName="SpeedrunCategory"
-                             IsChecked="{Binding SpeedrunCategory, Converter={StaticResource Equals}, ConverterParameter=Banned}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{StaticResource Icon}" Text="&#xE733;" FontSize="13" Margin="0,0,8,0" />
-                        <TextBlock><Run Text="{loc:Tr speedrun.banned}" /><Run Text="  " /><Run Text="{Binding SpeedrunBannedCount, Mode=OneWay}" /></TextBlock>
-                    </StackPanel>
-                </RadioButton>
-            </StackPanel>
+            <!-- Única categoría, con el aspecto de la ficha elegida de speedrun.com: los no permitidos ya salen en el aviso de arriba -->
+            <Border HorizontalAlignment="Left" Margin="0,16,0,0" Padding="14,8" CornerRadius="6" Background="{DynamicResource AccentBrush}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource Icon}" Text="&#xE930;" FontSize="13" Margin="0,0,8,0" Foreground="{DynamicResource OnAccentBrush}" />
+                    <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource OnAccentBrush}"><Run Text="{loc:Tr speedrun.allowed}" /><Run Text="  " /><Run Text="{Binding SpeedrunAllowedCount, Mode=OneWay}" /></TextBlock>
+                </StackPanel>
+            </Border>
 
-            <!-- Qué significa la categoría elegida -->
             <Border Style="{StaticResource Panel}" Margin="0,12,0,0" Padding="16,12">
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Left" Style="{StaticResource Icon}" Text="&#xE946;" Foreground="{DynamicResource Accent2Brush}" Margin="0,1,12,0" VerticalAlignment="Top" />
-                    <TextBlock TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource TextBrush}">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Text" Value="{loc:Tr speedrun.allowed.text}" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SpeedrunCategory}" Value="Banned">
-                                        <Setter Property="Text" Value="{loc:Tr speedrun.banned.text}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                    <TextBlock Text="{loc:Tr speedrun.allowed.text}" TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource TextBrush}" />
                 </DockPanel>
             </Border>
 
@@ -182,10 +131,6 @@
                                                 </Border>
                                             </StackPanel>
                                             <TextBlock Text="{Binding Item.Description}" FontSize="12" Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" Margin="0,3,0,0" />
-                                            <StackPanel x:Name="Warning" Orientation="Horizontal" Margin="0,6,0,0" Visibility="Collapsed">
-                                                <TextBlock Style="{StaticResource Icon}" Text="&#xE7BA;" FontSize="12" Foreground="{DynamicResource WarningBrush}" Margin="0,0,6,0" />
-                                                <TextBlock Text="{loc:Tr speedrun.enabledWarning}" FontSize="12" Foreground="{DynamicResource WarningBrush}" />
-                                            </StackPanel>
                                         </StackPanel>
 
                                         <TextBlock Grid.Column="2" Text="{Binding Item.Author}" FontSize="13" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" />
@@ -204,14 +149,6 @@
                                     <Trigger SourceName="Row" Property="IsMouseOver" Value="True">
                                         <Setter TargetName="Row" Property="Background" Value="{DynamicResource Surface2Brush}" />
                                     </Trigger>
-                                    <!-- Un mod no permitido que está activado invalidaría la run -->
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding Banned}" Value="True" />
-                                            <Condition Binding="{Binding Item.Installed.IsEnabled}" Value="True" />
-                                        </MultiDataTrigger.Conditions>
-                                        <Setter TargetName="Warning" Property="Visibility" Value="Visible" />
-                                    </MultiDataTrigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

@@ -20,6 +20,7 @@ public static partial class ModService
         var mods = new List<ModEntry>();
         mods.AddRange(ScanDir(game.PluginsDir, enabled: true));
         mods.AddRange(ScanDir(game.DisabledDir, enabled: false));
+        PluginInspector.SaveCache();
         return mods;
     }
 
@@ -49,7 +50,7 @@ public static partial class ModService
                 : isDir ? Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories).Where(IsRenamedDll).ToList()
                 : [path];
 
-            var metas = dlls.Concat(renamed).Select(PluginInspector.Inspect).ToList();
+            var metas = dlls.Concat(renamed).Select(PluginInspector.InspectCached).ToList();
             var plugins = metas.SelectMany(m => m.Plugins).ToList();
             var kind = metas.Select(m => m.Kind).Where(k => k != LoaderKind.Library).DefaultIfEmpty(LoaderKind.Library).Min();
 
@@ -83,17 +84,32 @@ public static partial class ModService
             if (!mod.IsDirectory) path = RestoredDllName(path);
         }
 
-        var inPlugins = string.Equals(Path.GetFullPath(Path.GetDirectoryName(path)!), Path.GetFullPath(game.PluginsDir), StringComparison.OrdinalIgnoreCase);
-        if (inPlugins == enabled) return;
-
-        var targetDir = enabled ? game.PluginsDir : game.DisabledDir;
-        Directory.CreateDirectory(targetDir);
-        var target = Path.Combine(targetDir, Path.GetFileName(path));
+        if (MoveTarget(game, path, enabled) is not { } target) return;
+        Directory.CreateDirectory(Path.GetDirectoryName(target)!);
         if (Path.Exists(target))
             throw new IOException(Loc.T("err.exists", Path.GetFileName(path), enabled ? "plugins" : "disabled_plugins"));
 
         if (mod.IsDirectory) Directory.Move(path, target);
         else File.Move(path, target);
+    }
+
+    /// <summary>
+    /// Otra copia que ocupa el sitio al que iría el mod al activarlo o desactivarlo (la misma carpeta en plugins y en
+    /// disabled_plugins); null si no hay conflicto.
+    /// </summary>
+    public static string? ExistingCopy(GameInstall game, ModEntry mod, bool enabled)
+    {
+        if (mod.Enabled == enabled) return null;
+        var path = enabled && mod.RenamedDlls.Count > 0 && !mod.IsDirectory ? RestoredDllName(mod.FullPath) : mod.FullPath;
+        return MoveTarget(game, path, enabled) is { } target && Path.Exists(target) ? target : null;
+    }
+
+    // Adónde se mueve el mod para activarlo (plugins) o desactivarlo (disabled_plugins); null si ya está ahí.
+    private static string? MoveTarget(GameInstall game, string path, bool enabled)
+    {
+        var inPlugins = string.Equals(Path.GetFullPath(Path.GetDirectoryName(path)!), Path.GetFullPath(game.PluginsDir), StringComparison.OrdinalIgnoreCase);
+        if (inPlugins == enabled) return null;
+        return Path.Combine(enabled ? game.PluginsDir : game.DisabledDir, Path.GetFileName(path));
     }
 
     /// <summary>Envía el mod a la Papelera de reciclaje (recuperable).</summary>

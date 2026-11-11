@@ -7,27 +7,10 @@ public sealed partial class MainViewModel
 {
     private const string LeaderboardUrl = "https://www.speedrun.com/Flipping_Is_Hard";
 
-    private IReadOnlyList<SpeedrunItemViewModel> _speedrunMods = [];
-    private string _speedrunCategory = "Allowed";
+    /// <summary>Mods del catálogo permitidos en runs: los únicos que lista la pestaña Speedrun.</summary>
+    public IReadOnlyList<SpeedrunItemViewModel> SpeedrunItems { get; private set; } = [];
 
-    /// <summary>En la pestaña Speedrun la barra lateral muestra la portada del juego en vez del icono del programa.</summary>
-    public bool IsSpeedrunPage => CurrentPage == "Speedrun";
-
-    public int SpeedrunAllowedCount => _speedrunMods.Count(m => m.Allowed);
-    public int SpeedrunBannedCount => _speedrunMods.Count(m => m.Banned);
-
-    /// <summary>"Allowed" o "Banned": las dos categorías de la pestaña Speedrun.</summary>
-    public string SpeedrunCategory
-    {
-        get => _speedrunCategory;
-        set
-        {
-            if (Set(ref _speedrunCategory, value)) OnPropertyChanged(nameof(SpeedrunItems));
-        }
-    }
-
-    public IReadOnlyList<SpeedrunItemViewModel> SpeedrunItems =>
-        _speedrunMods.Where(m => m.Allowed == (SpeedrunCategory == "Allowed")).ToList();
+    public int SpeedrunAllowedCount => SpeedrunItems.Count;
 
     /// <summary>Mods activados que no están en "Permitidos" (también los que no salen en el catálogo): invalidan una run.</summary>
     public IReadOnlyList<ModItemViewModel> RunBlockingMods => Mods.Where(m => m.IsEnabled && !IsAllowedInRuns(m)).ToList();
@@ -45,7 +28,7 @@ public sealed partial class MainViewModel
 
     // Por repo seguido o por el mod que el catálogo reconoció como instalado (también los instalados a mano).
     private bool IsAllowedInRuns(ModItemViewModel mod) =>
-        _speedrunMods.Any(s => s.Allowed && (s.Item.Installed == mod || string.Equals(mod.Source?.Repo, s.Item.Repo, StringComparison.OrdinalIgnoreCase)));
+        SpeedrunItems.Any(s => s.Item.Installed == mod || string.Equals(mod.Source?.Repo, s.Item.Repo, StringComparison.OrdinalIgnoreCase));
 
     private void RaiseRunBlocking()
     {
@@ -71,13 +54,13 @@ public sealed partial class MainViewModel
     }
 
     // Usa las mismas tarjetas que "Explorar", así comparten la release consultada y el mod instalado.
+    // Los no permitidos no se listan: cualquier mod activado fuera de esta lista ya sale en el aviso de RunBlockingMods.
     private void RefreshSpeedrun()
     {
-        _speedrunMods = Catalog.Where(c => c.Entry.Speedrun is not null)
+        SpeedrunItems = Catalog.Where(c => c.Entry.Speedrun is { Allowed: true })
             .Select(c => new SpeedrunItemViewModel(c, c.Entry.Speedrun!))
             .ToList();
-        OnPropertyChanged(nameof(SpeedrunAllowedCount));
-        OnPropertyChanged(nameof(SpeedrunBannedCount));
         OnPropertyChanged(nameof(SpeedrunItems));
+        OnPropertyChanged(nameof(SpeedrunAllowedCount));
     }
 }

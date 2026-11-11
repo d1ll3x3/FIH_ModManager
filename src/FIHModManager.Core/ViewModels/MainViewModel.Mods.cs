@@ -9,10 +9,25 @@ public sealed partial class MainViewModel
 {
     private string _modFilter = "";
     private string _modStatus = "All";
+    private bool _isLoadingMods;
 
     public ObservableCollection<ModItemViewModel> Mods { get; } = [];
     /// <summary>Mods visibles con la búsqueda y el filtro de estado aplicados: primero los que tienen actualización, luego los activados.</summary>
     public ObservableCollection<ModItemViewModel> FilteredMods { get; } = [];
+    /// <summary>Mods instalados más de una vez; cada grupo sale como aviso arriba de "Mis mods".</summary>
+    public IReadOnlyList<DuplicateGroup> DuplicateGroups { get; private set; } = [];
+
+    /// <summary>Primera lectura de la carpeta de mods de la instalación elegida: sin esto se vería "Todavía no hay mods".</summary>
+    public bool IsLoadingMods
+    {
+        get => _isLoadingMods;
+        private set
+        {
+            if (Set(ref _isLoadingMods, value)) OnPropertyChanged(nameof(ShowModsEmpty));
+        }
+    }
+
+    public bool ShowModsEmpty => Mods.Count == 0 && !IsLoadingMods;
 
     public int EnabledModCount => Mods.Count(m => m.IsEnabled);
     public int DisabledModCount => Mods.Count - EnabledModCount;
@@ -50,9 +65,11 @@ public sealed partial class MainViewModel
     public RelayCommand OpenModFolderCommand { get; private set; } = null!;
     public RelayCommand OpenPluginsFolderCommand { get; private set; } = null!;
     public RelayCommand OpenModConfigCommand { get; private set; } = null!;
+    public AsyncCommand ResolveDuplicateCommand { get; private set; } = null!;
 
     private void InitMods()
     {
+        ResolveDuplicateCommand = new AsyncCommand(p => ResolveDuplicateAsync((DuplicateGroup)p!), _ => !IsBusy);
         AddModFileCommand = new AsyncCommand(AddModFromFileAsync, () => HasGame && !IsBusy);
         CheckUpdatesCommand = new AsyncCommand(() => CheckUpdatesAsync(silent: false), () => HasGame && !IsBusy);
         DeleteModCommand = new AsyncCommand(p => DeleteModAsync((ModItemViewModel)p!));
@@ -82,7 +99,9 @@ public sealed partial class MainViewModel
             : [];
 
         // Se conserva la última versión consultada en GitHub para no perder el aviso de actualización.
-        var latest = Mods.Where(m => m.LatestTag is not null).ToDictionary(m => m.Entry.Key, m => m.LatestTag, StringComparer.OrdinalIgnoreCase);
+        // Un mod duplicado repite la clave (plugins y disabled_plugins): no se puede usar ToDictionary.
+        var latest = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var m in Mods.Where(m => m.LatestTag is not null)) latest.TryAdd(m.Entry.Key, m.LatestTag!);
 
         Mods.Clear();
         foreach (var e in entries)
@@ -93,6 +112,9 @@ public sealed partial class MainViewModel
             if (latest.TryGetValue(e.Key, out var tag)) vm.LatestTag = tag;
             Mods.Add(vm);
         }
+        DuplicateGroups = FindDuplicates(Mods);
+        foreach (var m in Mods) m.IsDuplicate = DuplicateGroups.Any(g => g.Copies.Contains(m));
+        OnPropertyChanged(nameof(DuplicateGroups));
 
         // Fuentes de mods que ya no existen (borrados a mano) se limpian.
         var keys = entries.Select(e => e.Key).ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -110,9 +132,12 @@ public sealed partial class MainViewModel
     private void RefreshFilteredMods(bool keepOrder = false)
     {
         // Al cambiar un switch se conserva el orden anterior para que la tarjeta no salte de sitio bajo el ratón.
-        var previous = keepOrder
-            ? FilteredMods.Select((m, i) => (m.Entry.Key, i)).ToDictionary(x => x.Key, x => x.i, StringComparer.OrdinalIgnoreCase)
-            : null;
+        Dictionary<string, int>? previous = null;
+        if (keepOrder)
+        {
+            previous = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            for (var i = 0; i < FilteredMods.Count; i++) previous.TryAdd(FilteredMods[i].Entry.Key, i);
+        }
         var visible = Mods.Where(m => m.Matches(ModFilter) && MatchesStatus(m));
         var ordered = previous is not null
             ? visible.OrderBy(m => previous.GetValueOrDefault(m.Entry.Key, int.MaxValue))
@@ -141,6 +166,47 @@ public sealed partial class MainViewModel
         OnPropertyChanged(nameof(ModsActiveText));
         OnPropertyChanged(nameof(ModsInstalledText));
         OnPropertyChanged(nameof(UpdatesText));
+        OnPropertyChanged(nameof(ShowModsEmpty));
+    }
+
+    // Copias del mismo mod: misma clave (una en plugins y otra en disabled_plugins) o algún GUID en común.
+    private static List<DuplicateGroup> FindDuplicates(IReadOnlyList<ModItemViewModel> mods)
+    {
+        var groups = new List<List<ModItemViewModel>>();
+        foreach (var mod in mods)
+        {
+            var related = groups.Where(g => g.Any(o => IsSameMod(o, mod))).ToList();
+            var merged = related.SelectMany(g => g).Append(mod).ToList();
+            foreach (var g in related) groups.Remove(g);
+            groups.Add(merged);
+        }
+        return groups.Where(g => g.Count > 1).Select(g => new DuplicateGroup(g)).ToList();
+    }
+
+    private static bool IsSameMod(ModItemViewModel a, ModItemViewModel b) =>
+        string.Equals(a.Entry.Key, b.Entry.Key, StringComparison.OrdinalIgnoreCase)
+        || a.Entry.Guids.Intersect(b.Entry.Guids, StringComparer.OrdinalIgnoreCase).Any();
+
+    /// <summary>Deja la copia más nueva (activada si alguna copia lo estaba) y manda las demás a la Papelera.</summary>
+    private async Task ResolveDuplicateAsync(DuplicateGroup group)
+    {
+        if (!EnsureGameClosed()) return;
+        var game = SelectedGame!;
+        var keep = group.Newest;
+        var wasEnabled = group.Copies.Any(c => c.IsEnabled);
+
+        await RunBusyAsync(Loc.T("busy.deleting", keep.Title), async () =>
+        {
+            await Task.Run(() =>
+            {
+                foreach (var copy in group.Copies.Where(c => c != keep)) ModService.Delete(copy.Entry);
+                // Con las otras copias fuera ya no hay nada en el sitio al que se mueve.
+                ModService.SetEnabled(game, keep.Entry, wasEnabled);
+            });
+            // ReloadModsAsync ya olvida el repo seguido de las copias borradas.
+            await ReloadModsAsync();
+            ShowToast(Loc.T("toast.dupResolved", keep.CopyLabel), ToastKind.Success);
+        });
     }
 
     private async Task ToggleModAsync(ModItemViewModel mod, bool enabled)
@@ -149,6 +215,35 @@ public sealed partial class MainViewModel
         {
             mod.SetEnabledState(mod.IsEnabled);
             return;
+        }
+
+        // La misma carpeta ya está en el otro lado (p. ej. se instaló una versión nueva con la vieja desactivada).
+        if (ModService.ExistingCopy(SelectedGame!, mod.Entry, enabled) is { } path
+            && Mods.FirstOrDefault(m => string.Equals(m.Entry.FullPath, path, StringComparison.OrdinalIgnoreCase)) is { } other)
+        {
+            var replace = await ShowDialogAsync(new DialogViewModel
+            {
+                Title = Loc.T("dlg.replaceCopy.title", mod.Title),
+                Message = Loc.T("dlg.replaceCopy.msg", mod.CopyLabel, other.CopyLabel),
+                PrimaryText = Loc.T("dlg.replaceCopy.replace"),
+                IsDanger = true,
+            });
+            if (!replace)
+            {
+                mod.SetEnabledState(!enabled);
+                return;
+            }
+            try
+            {
+                await Task.Run(() => ModService.Delete(other.Entry));
+            }
+            catch (IOException ex)
+            {
+                Log.Error($"Enviar a la papelera {other.Entry.FullPath}", ex);
+                mod.SetEnabledState(!enabled);
+                ShowToast(FriendlyError(ex), ToastKind.Error);
+                return;
+            }
         }
 
         try

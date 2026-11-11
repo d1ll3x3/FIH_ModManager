@@ -49,12 +49,30 @@
             </RadioButton>
         </StackPanel>
 
+        <!-- Mods instalados más de una vez: BepInEx solo carga una copia -->
+        <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding DuplicateGroups}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type vm:DuplicateGroup}">
+                    <Border Background="{StaticResource WarningSoftBrush}" CornerRadius="10" Padding="14,10" Margin="0,0,0,10">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Left" Style="{StaticResource Icon}" Text="&#xE7BA;" Foreground="{StaticResource WarningBrush}" Margin="0,0,10,0" VerticalAlignment="Center" />
+                            <Button DockPanel.Dock="Right" Content="{loc:Tr mods.dup.keep}" Margin="12,0,0,0" VerticalAlignment="Center"
+                                    Command="{Binding DataContext.ResolveDuplicateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="12" VerticalAlignment="Center" />
+                        </DockPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
         <Grid>
             <TextBlock Text="{loc:Tr mods.noMatches}" Style="{StaticResource Muted}" HorizontalAlignment="Center" Margin="0,24,0,0"
                        Visibility="{Binding NoModMatches, Converter={StaticResource BoolToVis}}" />
+            <TextBlock Text="{loc:Tr mods.loading}" Style="{StaticResource Muted}" HorizontalAlignment="Center" Margin="0,24,0,0"
+                       Visibility="{Binding IsLoadingMods, Converter={StaticResource BoolToVis}}" />
             <!-- Vacío -->
             <Border Style="{StaticResource Card}" VerticalAlignment="Top" Padding="36" BorderBrush="#3D3D52"
-                    Visibility="{Binding Mods.Count, Converter={StaticResource InvBoolToVis}}">
+                    Visibility="{Binding ShowModsEmpty, Converter={StaticResource BoolToVis}}">
                 <StackPanel HorizontalAlignment="Center">
                     <TextBlock Style="{StaticResource Icon}" Text="&#xE896;" FontSize="40" Foreground="{StaticResource MutedBrush}" />
                     <TextBlock Text="{loc:Tr mods.empty.title}" Style="{StaticResource H2}" HorizontalAlignment="Center" Margin="0,14,0,6" />
@@ -100,6 +118,9 @@
                                             </Border>
                                             <Border Style="{StaticResource Badge}" Visibility="{Binding ExtraPlugins, Converter={StaticResource BoolToVis}}">
                                                 <TextBlock Text="{Binding ExtraPlugins}" />
+                                            </Border>
+                                            <Border Style="{StaticResource Badge}" Background="{StaticResource WarningSoftBrush}" Visibility="{Binding IsDuplicate, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="{loc:Tr mods.dup.badge}" Foreground="{StaticResource WarningBrush}" />
                                             </Border>
                                         </StackPanel>
                                         <TextBlock Style="{StaticResource Muted}" FontSize="12" Margin="0,4,0,0" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap">

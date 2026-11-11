@@ -41,6 +41,17 @@
                     <TextBox Text="{Binding CatalogFilter, UpdateSourceTrigger=PropertyChanged}" Tag="{loc:Tr explore.search}" Padding="36,9,10,9" />
                     <TextBlock Style="{StaticResource Icon}" Text="&#xE721;" FontSize="13" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Left" Margin="13,0,0,0" />
                 </Grid>
+                <!-- Filtro por creador -->
+                <ComboBox DockPanel.Dock="Right" Width="210" Margin="0,0,10,0" ItemsSource="{Binding CatalogAuthors}" SelectedItem="{Binding CatalogAuthor}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:FilterOption}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Style="{StaticResource Icon}" Text="&#xE77B;" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,0,8,0" />
+                                <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
                 <TextBlock Text="{loc:Tr explore.section}" Style="{StaticResource H2}" VerticalAlignment="Center" />
             </DockPanel>
 

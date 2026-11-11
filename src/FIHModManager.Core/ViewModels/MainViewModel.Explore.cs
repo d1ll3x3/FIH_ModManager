@@ -10,6 +10,7 @@ public sealed partial class MainViewModel
     private string _repoInput = "";
     private string _catalogFilter = "";
     private string _catalogCategory = "All";
+    private FilterOption? _catalogAuthor;
     private string? _catalogError;
     private bool _catalogLoaded;
     private IReadOnlyList<CatalogGroup> _catalogGroups = [];
@@ -48,6 +49,18 @@ public sealed partial class MainViewModel
         }
     }
 
+    /// <summary>"Todos los creadores" y cada autor de "Explorar" con cuántos mods tiene.</summary>
+    public IReadOnlyList<FilterOption> CatalogAuthors { get; private set; } = [];
+
+    public FilterOption? CatalogAuthor
+    {
+        get => _catalogAuthor;
+        set
+        {
+            if (Set(ref _catalogAuthor, value)) RefreshCatalogGroups();
+        }
+    }
+
     public string RepoInput { get => _repoInput; set => Set(ref _repoInput, value); }
 
     public string? CatalogError { get => _catalogError; private set => Set(ref _catalogError, value); }
@@ -76,8 +89,10 @@ public sealed partial class MainViewModel
     private void ApplyCatalog(IReadOnlyList<CatalogEntry> entries)
     {
         Catalog.Clear();
-        foreach (var entry in entries) Catalog.Add(new CatalogItemViewModel(entry));
+        // Con la release guardada se reconocen los mods instalados a mano desde el arranque, sin esperar a GitHub.
+        foreach (var entry in entries) Catalog.Add(new CatalogItemViewModel(entry) { Release = GitHubService.GetCachedRelease(entry.Repo) });
         _catalogLoaded = false;
+        RefreshCatalogAuthors();
         RefreshCatalogGroups();
         RefreshSpeedrun();
         SyncCatalogInstalled();
@@ -98,9 +113,27 @@ public sealed partial class MainViewModel
             await LoadCatalogAsync(force: false);
     }
 
+    // Se rehace al cambiar el catálogo o el idioma; el autor elegido se conserva si sigue en la lista.
+    private void RefreshCatalogAuthors()
+    {
+        var selected = CatalogAuthor?.Value ?? "";
+        CatalogAuthors =
+        [
+            new FilterOption("", Loc.T("explore.filter.allAuthors")),
+            ..Catalog.Where(c => c.Entry.Explore)
+                .GroupBy(c => c.Author, StringComparer.OrdinalIgnoreCase)
+                .OrderBy(g => g.Key, StringComparer.CurrentCultureIgnoreCase)
+                .Select(g => new FilterOption(g.Key, $"{g.Key} ({g.Count()})")),
+        ];
+        OnPropertyChanged(nameof(CatalogAuthors));
+        _catalogAuthor = CatalogAuthors.FirstOrDefault(a => string.Equals(a.Value, selected, StringComparison.OrdinalIgnoreCase)) ?? CatalogAuthors[0];
+        OnPropertyChanged(nameof(CatalogAuthor));
+    }
+
     private void RefreshCatalogGroups() =>
         CatalogGroups = Catalog.Where(c => c.Entry.Explore && c.Matches(CatalogFilter)
-                                           && (CatalogCategory == "All" || c.Entry.Category == CatalogCategory))
+                                           && (CatalogCategory == "All" || c.Entry.Category == CatalogCategory)
+                                           && (CatalogAuthor is not { Value.Length: > 0 } author || string.Equals(c.Author, author.Value, StringComparison.OrdinalIgnoreCase)))
             .GroupBy(c => c.Entry.Category)
             .OrderBy(g => Array.IndexOf(CatalogService.Categories, g.Key))
             .Select(g => new CatalogGroup(g.Key, g.ToList()))

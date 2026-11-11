@@ -11,6 +11,60 @@ namespace FIHModManager.Services;
 /// </summary>
 public static class PluginInspector
 {
+    // Abrir una DLL que el antivirus no conoce puede tardar segundos (la analiza antes de dejarla leer; se vieron 33 s
+    // con una veintena de mods). Lo leído se guarda en disco y al arrancar solo se abren las DLL nuevas o cambiadas.
+    private static readonly string CachePath = Path.Combine(Log.DataDir, "plugin-cache.json");
+    private static readonly Dictionary<string, CachedMeta> Cache = LoadCache();
+    private static bool _cacheDirty;
+
+    public sealed record CachedMeta(long Size, DateTime Modified, AssemblyMeta Meta);
+
+    /// <summary>Como <see cref="Inspect(string)"/>, pero reutiliza lo leído antes si la DLL no ha cambiado.</summary>
+    public static AssemblyMeta InspectCached(string dllPath)
+    {
+        var info = new FileInfo(dllPath);
+        lock (Cache)
+        {
+            if (Cache.TryGetValue(dllPath, out var cached) && cached.Size == info.Length && cached.Modified == info.LastWriteTimeUtc)
+                return cached.Meta;
+        }
+
+        var meta = Inspect(dllPath);
+        lock (Cache)
+        {
+            Cache[dllPath] = new CachedMeta(info.Length, info.LastWriteTimeUtc, meta);
+            _cacheDirty = true;
+        }
+        return meta;
+    }
+
+    /// <summary>Guarda la caché si ha cambiado, sin las DLL que ya no existen.</summary>
+    public static void SaveCache()
+    {
+        lock (Cache)
+        {
+            foreach (var path in Cache.Keys.Where(p => !File.Exists(p)).ToList())
+            {
+                Cache.Remove(path);
+                _cacheDirty = true;
+            }
+            if (!_cacheDirty) return;
+            try
+            {
+                JsonStore.Save(CachePath, Cache);
+                _cacheDirty = false;
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                // La caché es una optimización: si no se puede escribir, el próximo arranque vuelve a leer las DLL.
+                Log.Error("Guardar caché de plugins", ex);
+            }
+        }
+    }
+
+    private static Dictionary<string, CachedMeta> LoadCache() =>
+        new(JsonStore.Load<Dictionary<string, CachedMeta>>(CachePath) ?? [], StringComparer.OrdinalIgnoreCase);
+
     public static AssemblyMeta Inspect(string dllPath)
     {
         using var fs = File.OpenRead(dllPath);

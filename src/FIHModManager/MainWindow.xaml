@@ -26,19 +26,11 @@
             <DockPanel Margin="16,14,16,16">
                 <!-- Logo -->
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4,0,0,22">
-                    <Grid Width="42" Height="42">
-                        <Border CornerRadius="11" Visibility="{Binding IsSpeedrunPage, Converter={StaticResource InvBoolToVis}}">
-                            <Border.Background>
-                                <ImageBrush ImageSource="Resources/icon.png" Stretch="UniformToFill" />
-                            </Border.Background>
-                        </Border>
-                        <!-- Portada vertical: se ve su parte de arriba, con el título del juego -->
-                        <Border CornerRadius="11" Visibility="{Binding IsSpeedrunPage, Converter={StaticResource BoolToVis}}">
-                            <Border.Background>
-                                <ImageBrush ImageSource="Resources/speedrun_cover.png" Stretch="UniformToFill" AlignmentY="Top" />
-                            </Border.Background>
-                        </Border>
-                    </Grid>
+                    <Border Width="42" Height="42" CornerRadius="11">
+                        <Border.Background>
+                            <ImageBrush ImageSource="Resources/icon.png" Stretch="UniformToFill" />
+                        </Border.Background>
+                    </Border>
                     <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="FIH Mod Manager" FontSize="16" FontWeight="Bold" />
                         <TextBlock Text="Flipping is Hard" FontSize="12" Foreground="{DynamicResource MutedBrush}" />

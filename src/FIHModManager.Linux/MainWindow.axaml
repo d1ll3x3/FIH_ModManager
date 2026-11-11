@@ -16,12 +16,7 @@
                 <DockPanel Margin="16,18,16,16">
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4,0,0,22" Spacing="12">
                         <Border Width="42" Height="42" CornerRadius="11" ClipToBounds="True">
-                            <Panel>
-                                <Image Source="/Assets/icon.png" Stretch="UniformToFill" IsVisible="{Binding !IsSpeedrunPage}" />
-                                <!-- Portada vertical: se ve su parte de arriba, con el título del juego -->
-                                <Image Source="/Assets/speedrun_cover.png" Width="42" Height="63" Stretch="Uniform" VerticalAlignment="Top"
-                                       IsVisible="{Binding IsSpeedrunPage}" />
-                            </Panel>
+                            <Image Source="/Assets/icon.png" Stretch="UniformToFill" />
                         </Border>
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock Text="FIH Mod Manager" FontSize="16" FontWeight="Bold" />

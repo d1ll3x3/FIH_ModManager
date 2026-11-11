@@ -21,6 +21,12 @@ public sealed class ModItemViewModel(ModEntry entry, ModSource? source, string? 
     public bool IsGitHub => Source is not null;
     public bool HasConfig => ConfigPath is not null;
 
+    /// <summary>Hay otra copia del mismo mod instalada (ver <see cref="DuplicateGroup"/>).</summary>
+    public bool IsDuplicate { get; set; }
+
+    /// <summary>"TrainerHUD (v1.8.0, disabled_plugins)": distingue una copia de otra en el aviso de duplicados.</summary>
+    public string CopyLabel => $"{Entry.Key} ({(Version.Length > 0 ? Version + ", " : "")}{Path.GetFileName(Path.GetDirectoryName(Entry.FullPath))})";
+
     public string? Warning => Entry.Kind switch
     {
         _ when Entry.RenamedDlls.Count > 0 => null,
@@ -70,16 +76,34 @@ public sealed class ModItemViewModel(ModEntry entry, ModSource? source, string? 
         || Entry.Key.Contains(filter, StringComparison.OrdinalIgnoreCase);
 }
 
+/// <summary>
+/// Copias del mismo mod: la misma carpeta en plugins y en disabled_plugins, o el mismo GUID en dos entradas.
+/// BepInEx solo carga una, así que se avisa y se ofrece quedarse con la más nueva.
+/// </summary>
+public sealed class DuplicateGroup(IReadOnlyList<ModItemViewModel> copies)
+{
+    public IReadOnlyList<ModItemViewModel> Copies { get; } = copies;
+
+    /// <summary>La de versión más alta y, a igualdad (o sin versión legible), la modificada más tarde.</summary>
+    public ModItemViewModel Newest { get; } = copies
+        .OrderByDescending(c => System.Version.TryParse(c.Entry.Plugins.FirstOrDefault()?.Version, out var v) ? v : new System.Version())
+        .ThenByDescending(c => c.Entry.Modified)
+        .First();
+
+    public string Text => Loc.T("mods.dup.text", Newest.Title, string.Join(", ", Copies.Select(c => c.CopyLabel)), Newest.CopyLabel);
+}
+
+/// <summary>Opción de un desplegable de filtro: Value vacío es "todos".</summary>
+public sealed record FilterOption(string Value, string Label);
+
 public sealed record CatalogGroup(string Category, IReadOnlyList<CatalogItemViewModel> Items)
 {
     public string Title => Loc.T("cat.group." + Category);
 }
 
-/// <summary>Fila de la pestaña Speedrun: el mod del catálogo, si se permite en runs y su condición de uso, si la tiene.</summary>
+/// <summary>Fila de la pestaña Speedrun: un mod del catálogo permitido en runs y su condición de uso, si la tiene.</summary>
 public sealed record SpeedrunItemViewModel(CatalogItemViewModel Item, SpeedrunRule Rule)
 {
-    public bool Allowed => Rule.Allowed;
-    public bool Banned => !Rule.Allowed;
     public string? Note => Rule.Note is null ? null : Loc.Pick(Rule.Note);
 }
 

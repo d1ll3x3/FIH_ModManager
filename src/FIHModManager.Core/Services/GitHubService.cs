@@ -64,6 +64,12 @@ public static partial class GitHubService
         return release;
     }
 
+    /// <summary>La última release guardada del repo aunque esté caducada, sin conectarse; null si nunca se consultó.</summary>
+    public static GitHubRelease? GetCachedRelease(string repo)
+    {
+        lock (Cache) return Cache.TryGetValue(repo, out var cached) ? cached.Release : null;
+    }
+
     private static Dictionary<string, CachedRelease> LoadCache() =>
         new(JsonStore.Load<Dictionary<string, CachedRelease>>(CachePath) ?? [], StringComparer.OrdinalIgnoreCase);
 

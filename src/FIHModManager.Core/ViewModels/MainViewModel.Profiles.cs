@@ -91,7 +91,11 @@ public sealed partial class MainViewModel
         await RunBusyAsync(Loc.T("busy.applyProfile", item.Name), async () =>
         {
             var game = SelectedGame!;
-            var changes = Mods.Where(m => m.IsEnabled != wanted.Contains(m.Entry.Key)).Select(m => m.Entry).ToList();
+            // De un mod duplicado basta con que una copia quede como pide el perfil: mover la otra chocaría con ella.
+            var changes = Mods.Where(m => m.IsEnabled != wanted.Contains(m.Entry.Key)
+                                          && !Mods.Any(o => o != m && string.Equals(o.Entry.Key, m.Entry.Key, StringComparison.OrdinalIgnoreCase)
+                                                            && o.IsEnabled == wanted.Contains(o.Entry.Key)))
+                .Select(m => m.Entry).ToList();
             await Task.Run(() =>
             {
                 foreach (var mod in changes) ModService.SetEnabled(game, mod, wanted.Contains(mod.Key));

@@ -72,9 +72,27 @@
             </RadioButton>
         </StackPanel>
 
+        <!-- Mods instalados más de una vez: BepInEx solo carga una copia -->
+        <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding DuplicateGroups}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="vm:DuplicateGroup">
+                    <Border Background="{StaticResource WarningSoftBrush}" CornerRadius="10" Padding="14,10" Margin="0,0,0,10">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Left" Classes="icon" Text="{x:Static loc:Icons.Warning}" Foreground="{StaticResource WarningBrush}"
+                                       Margin="0,0,10,0" VerticalAlignment="Center" />
+                            <Button DockPanel.Dock="Right" Content="{loc:Tr mods.dup.keep}" Margin="12,0,0,0" VerticalAlignment="Center"
+                                    Command="{Binding $parent[UserControl].DataContext.ResolveDuplicateCommand}" CommandParameter="{Binding}" />
+                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="12" VerticalAlignment="Center" />
+                        </DockPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
         <Panel>
             <TextBlock Text="{loc:Tr mods.noMatches}" Classes="muted" HorizontalAlignment="Center" Margin="0,24,0,0" IsVisible="{Binding NoModMatches}" />
-            <Border Classes="card" VerticalAlignment="Top" Padding="36" IsVisible="{Binding Mods.Count, Converter={StaticResource NoItems}}">
+            <TextBlock Text="{loc:Tr mods.loading}" Classes="muted" HorizontalAlignment="Center" Margin="0,24,0,0" IsVisible="{Binding IsLoadingMods}" />
+            <Border Classes="card" VerticalAlignment="Top" Padding="36" IsVisible="{Binding ShowModsEmpty}">
                 <StackPanel HorizontalAlignment="Center" Spacing="6">
                     <TextBlock Classes="icon" Text="{x:Static loc:Icons.Download}" FontSize="44" Foreground="{StaticResource MutedBrush}" />
                     <TextBlock Text="{loc:Tr mods.empty.title}" Classes="h2" HorizontalAlignment="Center" Margin="0,8,0,0" />
@@ -116,6 +134,9 @@
                                             </Border>
                                             <Border Classes="badge" IsVisible="{Binding ExtraPlugins, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                                 <TextBlock Text="{Binding ExtraPlugins}" />
+                                            </Border>
+                                            <Border Classes="badge" Background="{StaticResource WarningSoftBrush}" IsVisible="{Binding IsDuplicate}">
+                                                <TextBlock Text="{loc:Tr mods.dup.badge}" Foreground="{StaticResource WarningBrush}" />
                                             </Border>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal" Margin="0,4,0,0" Spacing="10">
