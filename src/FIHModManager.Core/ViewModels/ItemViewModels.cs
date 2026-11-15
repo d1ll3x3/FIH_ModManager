@@ -101,10 +101,16 @@ public sealed record CatalogGroup(string Category, IReadOnlyList<CatalogItemView
     public string Title => Loc.T("cat.group." + Category);
 }
 
-/// <summary>Fila de la pestaña Speedrun: un mod del catálogo permitido en runs y su condición de uso, si la tiene.</summary>
-public sealed record SpeedrunItemViewModel(CatalogItemViewModel Item, SpeedrunRule Rule)
+/// <summary>
+/// Fila de la pestaña Speedrun: un mod del catálogo y su condición de uso, si la tiene. Con ShowStatus (lista "Mods para
+/// speedrun") dice además si se permite en runs; la condición ya lo dice cuando existe.
+/// </summary>
+public sealed record SpeedrunItemViewModel(CatalogItemViewModel Item, SpeedrunRule Rule, bool ShowStatus)
 {
     public string? Note => Rule.Note is null ? null : Loc.Pick(Rule.Note);
+    public bool Allowed => Rule.Allowed;
+    public bool HasStatus => ShowStatus && Rule.Note is null;
+    public string StatusText => Loc.T(Rule.Allowed ? "speedrun.allowed" : "speedrun.banned");
 }
 
 public sealed class CatalogItemViewModel(CatalogEntry entry) : ObservableObject

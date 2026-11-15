@@ -101,5 +101,7 @@ public sealed class CatalogEntry
 public sealed class SpeedrunRule
 {
     public bool Allowed { get; init; }
+    /// <summary>Herramienta hecha para speedrun (TAS, Sum of Best…): sale en la pestaña principal "Mods para speedrun".</summary>
+    public bool Tool { get; init; }
     public Dictionary<string, string>? Note { get; init; }
 }

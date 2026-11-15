@@ -147,6 +147,7 @@ public sealed partial class MainViewModel : ObservableObject
         foreach (var c in Catalog) c.RefreshAll();
         RefreshCatalogAuthors();
         RefreshCatalogGroups();
+        RefreshSpeedrun();
         foreach (var p in Profiles) p.RefreshAll();
         foreach (var e in SelectedConfig?.Sections.SelectMany(s => s.Entries) ?? []) e.RefreshAll();
     }

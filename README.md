@@ -22,8 +22,9 @@ update and configure mods without touching the game files by hand. Runs on **Win
   from their GitHub releases, plus any other repo (`user/repo` or URL). Shows a badge when a new release is out.
   The list comes from [FIH-ModCatalog](https://github.com/d1ll3x3/FIH-ModCatalog): to add your mod, open a pull
   request there.
-- **Speedrun**: speedrun mods split into the ones allowed and not allowed in runs submitted to
-  [speedrun.com](https://www.speedrun.com/Flipping_Is_Hard), with install buttons and switches. The window
+- **Speedrun**: tools made for speedrunning, labelled with whether you can use them in a run, and a second list
+  with every mod allowed in runs submitted to [speedrun.com](https://www.speedrun.com/Flipping_Is_Hard), with
+  install buttons and switches. The window
   takes the colours of the game's speedrun.com page while this tab is open.
 - **Configuration editor**: edits `BepInEx.cfg` and every mod `.cfg` with toggles, dropdowns and
   checkboxes. Only the changed lines are rewritten. Other files (`.json`, `.txt`) open as text.

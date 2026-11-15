@@ -180,6 +180,7 @@
       "icon": "timer",
       "speedrun": {
         "allowed": true,
+        "tool": true,
         "note": {
           "en": "Only for TAS runs",
           "es": "Solo para runs TAS",
@@ -240,6 +241,51 @@
         "ar": "تسابق ضد أشباح أفضل أرقامك، وشاهد وشارك المسارات.",
         "zh": "与个人最佳成绩的幽灵竞速，观战并分享路线。",
         "ko": "PB 고스트와 경주하고, 관전하고, 경로를 공유하세요."
+      }
+    },
+    {
+      "repo": "PgoTracker/SOB-mod",
+      "title": "Sum of Best",
+      "author": "PgoTracker",
+      "category": "practice",
+      "icon": "timer",
+      "speedrun": {
+        "allowed": true,
+        "tool": true
+      },
+      "description": {
+        "en": "Adds a cumulative Sum of Best column to the in-game splits timer and highlights new best segments in gold."
+      }
+    },
+    {
+      "repo": "d1ll3x3/FIH_OfficialSpeedrunMod",
+      "title": "Official Speedrun Mod",
+      "author": "Topper",
+      "category": "practice",
+      "icon": "timer",
+      "speedrun": {
+        "allowed": true,
+        "tool": true,
+        "note": {
+          "en": "Only for level and challenge runs",
+          "es": "Solo para runs de niveles y challenges",
+          "fr": "Uniquement pour les runs de niveaux et de défis",
+          "ru": "Только для забегов по уровням и испытаниям",
+          "pl": "Tylko do runów poziomów i wyzwań",
+          "ar": "لمحاولات المستويات والتحديات فقط",
+          "zh": "仅限关卡和挑战速通",
+          "ko": "레벨 및 챌린지 런 전용"
+        }
+      },
+      "description": {
+        "en": "Practice levels from the Speedrun app in your phone: teleports, a restart key, a timer for each level and your best times.",
+        "es": "Practica niveles desde la app Speedrun del móvil: teletransportes, tecla de reinicio, un timer por nivel y tus mejores tiempos.",
+        "fr": "Entraînez-vous sur les niveaux depuis l'app Speedrun du téléphone : téléportations, touche de redémarrage, un chrono par niveau et vos meilleurs temps.",
+        "ru": "Тренируйте уровни из приложения Speedrun в телефоне: телепорты, клавиша перезапуска, таймер для каждого уровня и ваши лучшие времена.",
+        "pl": "Ćwicz poziomy z aplikacji Speedrun w telefonie: teleporty, klawisz restartu, licznik czasu dla każdego poziomu i twoje najlepsze czasy.",
+        "ar": "تدرّب على المستويات من تطبيق Speedrun في الهاتف: انتقالات فورية، وزر لإعادة البدء، ومؤقت لكل مستوى، وأفضل أوقاتك.",
+        "zh": "在手机里的 Speedrun 应用中练习关卡：传送、重开键、每个关卡的计时器以及你的最佳时间。",
+        "ko": "휴대폰의 Speedrun 앱에서 레벨을 연습하세요: 텔레포트, 재시작 키, 레벨별 타이머와 최고 기록."
       }
     },
     {
