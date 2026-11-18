@@ -16,6 +16,17 @@ public static partial class GitHubService
     private static readonly Dictionary<string, CachedRelease> Cache = LoadCache();
     private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(30);
 
+    // releases.json del repo del catálogo: la última release de cada mod y del propio programa, que una Action renueva
+    // cada 30 minutos. Va por raw.githubusercontent.com, que no gasta cupo: con él, la API solo se consulta para los
+    // repos que no salen ahí (los que se instalan escribiendo usuario/repo).
+    private const string FeedUrl = "https://raw.githubusercontent.com/d1ll3x3/FIH-ModCatalog/data/releases.json";
+    private static readonly TimeSpan FeedTtl = TimeSpan.FromMinutes(10);
+    // Al refrescar a mano se vuelve a descargar, pero una sola vez para todas las consultas de esa tanda.
+    private static readonly TimeSpan ForcedFeedTtl = TimeSpan.FromSeconds(10);
+    private static readonly SemaphoreSlim FeedLock = new(1, 1);
+    private static Dictionary<string, GitHubRelease?>? _feed;
+    private static DateTime _feedFetchedAt;
+
     public sealed record CachedRelease(DateTime FetchedAt, GitHubRelease? Release);
 
     private static HttpClient CreateClient()
@@ -35,6 +46,16 @@ public static partial class GitHubService
 
     public static async Task<GitHubRelease?> GetLatestReleaseAsync(string repo, bool force = false)
     {
+        if (await GetFeedAsync(force) is { } feed && feed.TryGetValue(repo, out var fromFeed))
+        {
+            lock (Cache)
+            {
+                Cache[repo] = new CachedRelease(DateTime.UtcNow, fromFeed);
+                SaveCache();
+            }
+            return fromFeed;
+        }
+
         CachedRelease? cached;
         lock (Cache) Cache.TryGetValue(repo, out cached);
         if (!force && cached is not null && DateTime.UtcNow - cached.FetchedAt < CacheTtl) return cached.Release;
@@ -62,6 +83,36 @@ public static partial class GitHubService
             SaveCache();
         }
         return release;
+    }
+
+    // Las consultas de "Explorar" salen todas a la vez: solo la primera descarga el archivo y el resto lo reutiliza.
+    // Un fallo también cuenta como descarga, para no reintentarla (y esperar su timeout) una vez por mod.
+    private static async Task<Dictionary<string, GitHubRelease?>?> GetFeedAsync(bool force)
+    {
+        await FeedLock.WaitAsync();
+        try
+        {
+            if (DateTime.UtcNow - _feedFetchedAt < (force ? ForcedFeedTtl : FeedTtl)) return _feed;
+            _feedFetchedAt = DateTime.UtcNow;
+            try
+            {
+                using var doc = JsonDocument.Parse(await Http.GetStringAsync(FeedUrl));
+                var feed = new Dictionary<string, GitHubRelease?>(StringComparer.OrdinalIgnoreCase);
+                foreach (var entry in doc.RootElement.GetProperty("releases").EnumerateObject())
+                    feed[entry.Name] = entry.Value.ValueKind == JsonValueKind.Null ? null : ParseRelease(entry.Name, entry.Value);
+                _feed = feed;
+            }
+            catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException or KeyNotFoundException or InvalidOperationException)
+            {
+                // Sin el archivo se pregunta a la API repo por repo, como antes; si ya había uno, se sigue con él.
+                Log.Error("Descargar releases.json", ex);
+            }
+            return _feed;
+        }
+        finally
+        {
+            FeedLock.Release();
+        }
     }
 
     /// <summary>La última release guardada del repo aunque esté caducada, sin conectarse; null si nunca se consultó.</summary>
